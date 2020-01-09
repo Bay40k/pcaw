@@ -28,14 +28,16 @@ canvasAPI = Pcaw(access_token)
 
 
 # Return a paginated list of objects from an endpoint:
-canvasAPI.paginate(URL, 100) # (100 means 100 items per page)
+canvasAPI.paginate(url, 100) # (100 means 100 items per page)
 
 # You can also easily reference your access token/Authorization header with:
 canvasAPI.headers 
 # Returns: {'Authorization': "Bearer <token_goes_here>"}
 
-# Useful for something like: requests.get(url, headers=canvasAPI.headers)
+# Useful for something like: 
+import requests
+requests.get(url, headers=canvasAPI.headers)
 
 # And to add your own headers you could do:
-# requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
+requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
 ```
