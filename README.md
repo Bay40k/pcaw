@@ -27,7 +27,7 @@ access_token = '<token_goes_here>'
 canvasAPI = Pcaw(access_token)
 
 
-# Automatically paginate and return list of objects from an endpoint:
+# Automatically paginate and return full list of objects from an endpoint:
 canvasAPI.paginate(url, 100) # (100 is equivalent to the '?per_page=100' parameter)
 
 # You can also easily reference your access token/Authorization header with:
