@@ -10,7 +10,7 @@ url = 'https://example.instructure.com/courses/xxxxx/assignments'
 
 Set your API access token:
 ```python
-access_token = 'token_goes_here'
+access_token = '<token_goes_here>'
 ```
 
 Initialize pcaw with the access token:
@@ -20,7 +20,7 @@ canvasAPI = Pcaw(access_token)
 
 #### Example:
 ``` python
-url = 'https://example.instructure.com/courses/xxxxx/assignments'
+url = 'https://<canvas>/courses/xxxxx/assignments'
 access_token = 'token_goes_here'
 canvasAPI = Pcaw(access_token)
 
@@ -30,5 +30,5 @@ canvasAPI.paginate(URL, 100) # (100 means 100 items per page)
 
 # You can also easily reference your access token/Authorization header with:
 canvasAPI.headers 
-# ( Returns: {'Authorization': f"Bearer {access_token}"} )
+# ( Returns: {'Authorization': "Bearer <token_goes_here>"} )
 ```
