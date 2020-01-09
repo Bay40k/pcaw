@@ -23,7 +23,7 @@ canvasAPI = Pcaw(access_token)
 from pcaw import Pcaw
 
 url = 'https://<canvas>/courses/xxxxx/assignments'
-access_token = 'token_goes_here'
+access_token = '<token_goes_here>'
 canvasAPI = Pcaw(access_token)
 
 
