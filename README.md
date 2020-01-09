@@ -30,5 +30,5 @@ canvasAPI.paginate(URL, 100) # (100 means 100 items per page)
 
 # You can also easily reference your access token/Authorization header with:
 canvasAPI.headers 
-# (Returns: {'Authorization': f"Bearer {access_token}"}`)
+# ( Returns: {'Authorization': f"Bearer {access_token}"} )
 ```
