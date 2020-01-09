@@ -4,18 +4,31 @@ pcaw makes accessing and using the Canvas LMS REST API through Python a bit more
 
 #### Usage:
 Define a Canvas API endpoint to use (see Canvas API documentation):
-`url = 'https://example.instructure.com/courses/xxxxx/assignments'`
+```python
+url = 'https://example.instructure.com/courses/xxxxx/assignments'
+```
 
 Set your API access token:
-`access_token = 'token_goes_here'`
+```python
+access_token = 'token_goes_here'
+```
 
 Initialize pcaw with the access token:
-`canvasAPI = Pcaw(access_token)`
+```python
+canvasAPI = Pcaw(access_token)
+```
 
-#### Examples:
+#### Example:
+``` python
+url = 'https://example.instructure.com/courses/xxxxx/assignments'
+access_token = 'token_goes_here'
+canvasAPI = Pcaw(access_token)
 
-Return a paginated list of objects from an endpoint:
-`canvasAPI.paginate(URL, 100)` (100 means 100 items per page)
 
-You can also easily reference your access token/Authorization header with:
-`canvasAPI.headers`(Returns: `{'Authorization': f"Bearer {access_token}"}`)
+# Return a paginated list of objects from an endpoint:
+canvasAPI.paginate(URL, 100) # (100 means 100 items per page)
+
+# You can also easily reference your access token/Authorization header with:
+canvasAPI.headers 
+# (Returns: {'Authorization': f"Bearer {access_token}"}`)
+```
