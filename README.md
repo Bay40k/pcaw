@@ -7,7 +7,7 @@ pcaw makes accessing and using the Canvas LMS REST API through Python a bit more
 Define a Canvas API endpoint to use (see Canvas API documentation):
 
 ```python
-url = 'https://example.instructure.com/courses/xxxxx/assignments'
+url = 'https://<canvas>/courses/xxxxx/assignments'
 ```
 
 Set your API access token:
@@ -37,7 +37,7 @@ canvasAPI.paginate(url, 100) # (100 is equivalent to the '?per_page=100' paramet
 
 # Paginate with HTTP parameters
 params = {"scope": "sent", "as_user_id": user_id}
-anvasAPI.paginate(url, 100, params)
+canvasAPI.paginate(url, 100, params)
 
 # You can also easily reference your access token/Authorization header with:
 canvasAPI.headers
