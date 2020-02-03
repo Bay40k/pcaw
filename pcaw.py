@@ -49,8 +49,8 @@ class Pcaw:
         except JSONDecodeError:
             print("ERROR: The response is not valid JSON. \n")
             raise
-        finally:
-            print("ERROR: There was an unexpected error. \n")
+        except Exception as e:
+            print(f"ERROR: There was an unexpected error. {e}\n")
             raise
 
         item_set = []
