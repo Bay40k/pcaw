@@ -70,6 +70,6 @@ class Pcaw:
                 item_set.append(item)
 
         if not item_set:
-            print(f"There were no objects found at this endpoint: {url}")
+            print(f"There were no objects found at this endpoint: {r.url}")
 
         return item_set
