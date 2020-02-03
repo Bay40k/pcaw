@@ -35,14 +35,14 @@ class Pcaw:
         print(f"Full URL with HTTP params: {r.url}")
 
         assert "/api/v1" in url, "/api/v1 was not found in the passed URL."
-        assert r.status_code != 401, "401 Unauthorized, is your access token \
-        correct?"
+        assert r.status_code != 401, "401 Unauthorized, is your access " \
+            "token correct?"
 
-        assert r.status_code == requests.codes.ok, f"Request not OK, \
-        response code: {r.status_code}"
+        assert r.status_code == requests.codes.ok, "Request not OK, " \
+            f"response code: {r.status_code}"
 
-        assert "Log In to Canvas" not in r.text, "Canvas login page reached, \
-        is your access token correct?"
+        assert "Log In to Canvas" not in r.text, "Canvas login page " \
+            "reached, is your access token correct?"
 
         try:
             raw = r.json()
