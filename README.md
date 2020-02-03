@@ -22,7 +22,7 @@ Initialize pcaw with the access token:
 canvasAPI = Pcaw(access_token)
 ```
 
-## Example
+## Examples
 
 ``` python
 from pcaw import Pcaw
@@ -50,4 +50,10 @@ requests.get(url, headers=canvasAPI.headers)
 
 # And to add your own headers you could do:
 requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
+
+# Creating a course using genericPOST method:
+url = 'https://<canvas>/api/v1/accounts/x/courses'
+params = {'course[name]': "Course Name", 'course[course_code]': "Course_Code_1234"}
+canvasAPI.genericPOST(url, params)
+
 ```
