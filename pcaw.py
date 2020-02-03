@@ -18,9 +18,9 @@ class Pcaw:
             raise
 
     # Returns all items/objects (in an array) from an endpoint / handles pagination
-    def paginate(self, url, per_page):
+    def paginate(self, url, per_page, params=None):
         per_page_url = url + f"?per_page={per_page}"
-        r = requests.get(per_page_url, headers=self.headers)
+        r = requests.get(per_page_url, headers=self.headers, params=params)
 
         assert "/api/v1" in url, "/api/v1 was not found in the passed URL."
         assert r.status_code != 401, "401 Unauthorized, is your access token correct?"
@@ -37,10 +37,13 @@ class Pcaw:
             raise
 
         item_set = []
+        
+        print("pcaw: paginating\n")
+        print(f"Full URL with HTTP params: {r.url}")
 
         print('Going through first page...')
         for item in raw:
-            # print(item_set)
+            # print(item)
             item_set.append(item)
 
         print('Going through the next pages...')
