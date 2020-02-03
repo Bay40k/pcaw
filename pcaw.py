@@ -3,6 +3,7 @@ from json.decoder import JSONDecodeError
 
 # Python Canvas API Wrapper (pcaw)
 # Prototype, by Bailey M.
+# TODO: implement logger
 
 
 class Pcaw:
