@@ -69,3 +69,25 @@ canvasAPI.genericPOST(url, params)
 # Could also be written as:
 requests.post(url, headers=canvasAPI.headers, data=params)
 ```
+
+### Getting all assignment IDs in a course
+
+``python
+from pcaw import Pcaw
+
+domain = '<canvas instance domain>'
+course_id = 'xxxxxxx'
+
+url = f'https://{domain}/api/v1/courses/{course_id}/assignments'
+access_token = '<token_goes_here'
+canvasAPI = Pcaw(access_token)
+
+params = {}
+assignment_objects = canvasAPI.paginate(url, 100, params)
+
+assignment_ids = []
+for assignment in assignment_objects:
+    assignment_ids.append(assignment["id"])
+
+print(assignment_ids)
+```
