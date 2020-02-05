@@ -24,7 +24,9 @@ canvasAPI = Pcaw(access_token)
 
 ## Examples
 
-``` python
+### Pagination
+
+```python
 from pcaw import Pcaw
 
 url = 'https://<canvas>/courses/xxxxx/assignments'
@@ -38,7 +40,11 @@ canvasAPI.paginate(url, 100) # (100 is equivalent to the '?per_page=100' paramet
 # Paginate with HTTP parameters
 params = {"scope": "sent", "as_user_id": user_id}
 canvasAPI.paginate(url, 100, params)
+```
 
+### Authorization headers
+
+```python
 # You can also easily reference your access token/Authorization header with:
 canvasAPI.headers
 # Returns: {'Authorization': "Bearer <token_goes_here>"}
@@ -50,13 +56,16 @@ requests.get(url, headers=canvasAPI.headers)
 
 # And to add your own headers you could do:
 requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
+```
 
+### More examples
+
+```python
 # Creating a course using genericPOST method:
 url = 'https://<canvas>/api/v1/accounts/x/courses'
 params = {'course[name]': "Course Name", 'course[course_code]': "Course_Code_1234"}
 canvasAPI.genericPOST(url, params)
 
 # Could also be written as:
-requests.post(url, headers=canvasAPI.headers, data=params) 
-
+requests.post(url, headers=canvasAPI.headers, data=params)
 ```
