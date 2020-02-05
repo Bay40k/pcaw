@@ -72,7 +72,7 @@ requests.post(url, headers=canvasAPI.headers, data=params)
 
 ### Getting all assignment IDs in a course
 
-``python
+```python
 from pcaw import Pcaw
 
 domain = '<canvas instance domain>'
