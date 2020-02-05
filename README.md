@@ -56,4 +56,7 @@ url = 'https://<canvas>/api/v1/accounts/x/courses'
 params = {'course[name]': "Course Name", 'course[course_code]': "Course_Code_1234"}
 canvasAPI.genericPOST(url, params)
 
+# Could also be written as:
+requests.post(url, headers=canvasAPI.headers, data=params) 
+
 ```
