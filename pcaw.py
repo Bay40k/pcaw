@@ -10,6 +10,7 @@ import json
 class Pcaw:
     def __init__(self, access_token):
         self.headers = {'Authorization': f"Bearer {access_token}"}
+        self.access_token = access_token
 
     def genericPOST(self, endpoint, data):
         """
