@@ -98,4 +98,11 @@ for assignment in assignment_objects:
     assignment_ids.append(assignment["id"])
 
 print(assignment_ids)
+
+# or
+
+assignment_id_map = map(lambda x: x["id"], assignment_objects)
+assignment_ids = list(assignment_id_map)
+
+print(assignment_ids)
 ```
