@@ -1,5 +1,5 @@
 # file I use for testing the wrapper
-test_implementation.py
+test_implementation*
 
 # ignore pycache folder
 __pycache__/
