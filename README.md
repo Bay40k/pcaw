@@ -70,7 +70,8 @@ quiz_id = 1234
 # Additional parameters are optional
 addn_params = {'question[neutral_comments]': "Neutral Comment"}
 
-canvasAPI.create_question(course_id, quiz_id, "Title", "Text", "essay_question", addn_params, points=10)
+canvasAPI.create_question(course_id, quiz_id,
+                          "Title", "Text", "essay_question", addn_params, points=10)
 ```
 
 #### Creating a course using genericPOST method
