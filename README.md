@@ -4,10 +4,10 @@ pcaw makes accessing and using the Canvas LMS REST API through Python a bit more
 
 ## Usage
 
-Define a Canvas API endpoint to use (see Canvas API documentation):
+Define your Canvas domain:
 
 ```python
-url = 'https://<canvas>/api/v1/courses/xxxxx/assignments'
+domain = '<canvas>' # e.g. 'canvas.instructure.com'
 ```
 
 Set your API access token:
@@ -16,10 +16,10 @@ Set your API access token:
 access_token = '<token_goes_here>'
 ```
 
-Initialize pcaw with the access token:
+Initialize pcaw with the domain and access token:
 
 ```python
-canvasAPI = Pcaw(access_token)
+canvasAPI = Pcaw(domain, access_token)
 ```
 
 ## Examples
@@ -29,17 +29,18 @@ canvasAPI = Pcaw(access_token)
 ```python
 from pcaw import Pcaw
 
-url = 'https://<canvas>/courses/xxxxx/assignments'
+domain = '<canvas>'
 access_token = '<token_goes_here>'
-canvasAPI = Pcaw(access_token)
-# Show JSON HTTP responses: canvasAPI = Pcaw(access_token, True)
+canvasAPI = Pcaw(domain, access_token)
 
-# Automatically paginate and return full list of JSON objects from an endpoint:
-canvasAPI.paginate(url, 100) # (100 is equivalent to the '?per_page=100' parameter)
+endpoint_to_paginate = 'courses/xxxxx/assignments'
+
+# Automatically paginate and return full array of JSON objects from an endpoint:
+canvasAPI.paginate(endpoint_to_paginate, per_page=100)
 
 # Paginate with HTTP parameters
 params = {"scope": "sent", "as_user_id": user_id}
-canvasAPI.paginate(url, 100, params)
+canvasAPI.paginate(endpoint_to_paginate, per_page=100, params)
 ```
 
 ### Authorization headers
@@ -62,20 +63,21 @@ requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
 
 ```python
 # Creating a quiz question using create_question method:
-url = f'https://<canvas>/api/v1/courses/xxxx/quizzes/xxxx/questions'
+course_id = 1234
+quiz_id = 1234
+
 # Additional parameters are optional
 addn_params = {'question[neutral_comments]': "Neutral Comment"}
-canvasAPI.create_question(url, "Title", "Text", "essay_question", 10, addn_params)
+
+canvasAPI.create_question(course_id, quiz_id, "Title", "Text", "essay_question", points=10, addn_params)
 ```
 
 ```python
 # Creating a course using genericPOST method:
-url = 'https://<canvas>/api/v1/accounts/x/courses'
+endpoint = 'accounts/x/courses'
 params = {'course[name]': "Course Name", 'course[course_code]': "Course_Code_1234"}
-canvasAPI.genericPOST(url, params)
 
-# Could also be written as:
-requests.post(url, headers=canvasAPI.headers, data=params)
+canvasAPI.genericPOST(endpoint, params)
 ```
 
 ### Getting all assignment IDs in a course
@@ -83,15 +85,15 @@ requests.post(url, headers=canvasAPI.headers, data=params)
 ```python
 from pcaw import Pcaw
 
-domain = '<canvas instance domain>'
+domain = '<canvas>'
 course_id = 'xxxxxxx'
 
-url = f'https://{domain}/api/v1/courses/{course_id}/assignments'
-access_token = '<token_goes_here'
-canvasAPI = Pcaw(access_token)
+endpoint = f'courses/{course_id}/assignments'
+access_token = '<token_goes_here>'
+canvasAPI = Pcaw(domain, access_token)
 
-params = {}
-assignment_objects = canvasAPI.paginate(url, 100, params)
+params = {'example': "parameter"}
+assignment_objects = canvasAPI.paginate(endpoint, per_page=100, params)
 
 assignment_ids = []
 for assignment in assignment_objects:
