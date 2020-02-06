@@ -1,5 +1,6 @@
 import requests
 from json.decoder import JSONDecodeError
+import json
 
 # Python Canvas API Wrapper (pcaw)
 # Prototype, by Bailey M.
@@ -17,7 +18,8 @@ class Pcaw:
         """
         try:
             r = requests.post(endpoint, data=data, headers=self.headers)
-            print(r.text)
+            response_json = json.loads(r.text)
+            print(json.dumps(response_json, indent=2))
         except Exception:
             print(f"ERROR: There was an error running \
                 the request: {Exception}")
