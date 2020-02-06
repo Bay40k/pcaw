@@ -113,6 +113,7 @@ class Pcaw:
         https://canvas.instructure.com/doc/api/quiz_questions.html#method.quizzes/quiz_questions.create
         """
 
+        self.check_type("additional_params", addtional_params, dict)
         self.check_type("points", points, int)
         self.check_type("name", name, str)
         self.check_type("text", text, str)
