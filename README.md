@@ -61,8 +61,9 @@ requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
 
 ### More examples
 
+#### Creating a quiz question using create_question method
+
 ```python
-# Creating a quiz question using create_question method:
 course_id = 1234
 quiz_id = 1234
 
@@ -72,8 +73,9 @@ addn_params = {'question[neutral_comments]': "Neutral Comment"}
 canvasAPI.create_question(course_id, quiz_id, "Title", "Text", "essay_question", addn_params, points=10)
 ```
 
+#### Creating a course using genericPOST method
+
 ```python
-# Creating a course using genericPOST method:
 endpoint = 'accounts/x/courses'
 params = {'course[name]': "Course Name", 'course[course_code]': "Course_Code_1234"}
 
