@@ -7,7 +7,7 @@ pcaw makes accessing and using the Canvas LMS REST API through Python a bit more
 Define a Canvas API endpoint to use (see Canvas API documentation):
 
 ```python
-url = 'https://<canvas>/courses/xxxxx/assignments'
+url = 'https://<canvas>/api/v1/courses/xxxxx/assignments'
 ```
 
 Set your API access token:
