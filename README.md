@@ -89,11 +89,11 @@ canvasAPI.genericPOST(endpoint, params)
 from pcaw import Pcaw
 
 domain = '<canvas>'
-course_id = 'xxxxxxx'
-
-endpoint = f'courses/{course_id}/assignments'
 access_token = '<token_goes_here>'
 canvasAPI = Pcaw(domain, access_token)
+
+course_id = 'xxxxxxx'
+endpoint = f'courses/{course_id}/assignments'
 
 params = {'example': "parameter"}
 assignment_objects = canvasAPI.paginate(endpoint, params, per_page=100)
