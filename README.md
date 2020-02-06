@@ -40,7 +40,7 @@ canvasAPI.paginate(endpoint_to_paginate, per_page=100)
 
 # Paginate with HTTP parameters
 params = {"scope": "sent", "as_user_id": user_id}
-canvasAPI.paginate(endpoint_to_paginate, per_page=100, params)
+canvasAPI.paginate(endpoint_to_paginate, params, per_page=100)
 ```
 
 ### Authorization headers
@@ -69,7 +69,7 @@ quiz_id = 1234
 # Additional parameters are optional
 addn_params = {'question[neutral_comments]': "Neutral Comment"}
 
-canvasAPI.create_question(course_id, quiz_id, "Title", "Text", "essay_question", points=10, addn_params)
+canvasAPI.create_question(course_id, quiz_id, "Title", "Text", "essay_question", addn_params, points=10)
 ```
 
 ```python
@@ -93,7 +93,7 @@ access_token = '<token_goes_here>'
 canvasAPI = Pcaw(domain, access_token)
 
 params = {'example': "parameter"}
-assignment_objects = canvasAPI.paginate(endpoint, per_page=100, params)
+assignment_objects = canvasAPI.paginate(endpoint, params, per_page=100)
 
 assignment_ids = []
 for assignment in assignment_objects:

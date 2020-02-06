@@ -66,7 +66,7 @@ class Pcaw:
 
         print(f"pcaw: Success; POST request to '{endpoint}' sucessful")
 
-    def paginate(self, endpoint, per_page=100, params=None):
+    def paginate(self, endpoint, params=None, per_page=100):
         """
         Returns all items/JSON objects (in an array) from an endpoint
         / handles pagination
@@ -130,7 +130,7 @@ class Pcaw:
             f"instead it's: '{type(object_to_check).__name__}'"
 
     def create_question(self, course_id, quiz_id, name,
-                        text, q_type, points, addtional_params={}):
+                        text, q_type, addtional_params={}, points=1):
         """
         Creates a quiz question
 
