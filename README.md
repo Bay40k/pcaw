@@ -20,8 +20,6 @@ canvasAPI = Pcaw(domain, access_token)
 ```python
 from pcaw import Pcaw
 
-domain = '<canvas>'
-access_token = '<token_goes_here>'
 canvasAPI = Pcaw(domain, access_token)
 
 endpoint_to_paginate = 'courses/xxxxx/assignments'
@@ -77,10 +75,6 @@ canvasAPI.genericPOST(endpoint, params)
 ### Getting all assignment IDs in a course
 
 ```python
-from pcaw import Pcaw
-
-domain = '<canvas>'
-access_token = '<token_goes_here>'
 canvasAPI = Pcaw(domain, access_token)
 
 course_id = 'xxxxxxx'
