@@ -32,7 +32,7 @@ from pcaw import Pcaw
 url = 'https://<canvas>/courses/xxxxx/assignments'
 access_token = '<token_goes_here>'
 canvasAPI = Pcaw(access_token)
-
+# Show JSON HTTP responses: canvasAPI = Pcaw(access_token, True)
 
 # Automatically paginate and return full list of JSON objects from an endpoint:
 canvasAPI.paginate(url, 100) # (100 is equivalent to the '?per_page=100' parameter)
@@ -59,6 +59,14 @@ requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
 ```
 
 ### More examples
+
+```python
+# Creating a quiz question using create_question method:
+url = f'https://<canvas>/api/v1/courses/xxxx/quizzes/xxxx/questions'
+# Additional parameters are optional
+addn_params = {'question[neutral_comments]': "Neutral Comment"}
+canvasAPI.create_question(url, "Title", "Text", "essay_question", 10, addn_params)
+```
 
 ```python
 # Creating a course using genericPOST method:
