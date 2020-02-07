@@ -14,6 +14,8 @@ import urllib.parse
 #       - change genericPOST method name to just 'post'
 #       - make QuizObject class
 #       - move mixin classes to separate files?
+#       - refactor paginate method to use request method
+#       - implement get_questions Quizzes method
 
 
 class Quizzes:
@@ -35,7 +37,7 @@ class Quizzes:
 
         quiz_url = urljoin(self.domain, full_endpoint)
 
-        print(f"pcaw: Generating quiz object from: {quiz_url}")
+        print(f"pcaw: get_quiz: Generating quiz object from: {quiz_url}")
         if additional_params:
             print(f"Additional parameters:")
             pprint(additional_params, width=50)
@@ -174,10 +176,10 @@ class Pcaw(Quizzes):
                 return True
         except JSONDecodeError:
             if self.show_responses:
-                print("ERROR: The response is not valid JSON. Possibly HTML?"
+                print("pcaw: ERROR: The response is not valid JSON. Possibly HTML?"
                       f"\nRaw Response:\n{json_string}")
             else:
-                print("ERROR: The response is not valid JSON. Possibly HTML?"
+                print("pcaw: ERROR: The response is not valid JSON. Possibly HTML?"
                       "\nEnable show_responses to see raw response")
 
     def request(self, url, request_type, data=None):
@@ -199,12 +201,12 @@ class Pcaw(Quizzes):
         request_types = ["GET", "POST", "PUT", "DELETE"]
 
         assert request_type in request_types, \
-            f"pcaw: Not a valid request type: {request_type}"
+            f"pcaw: request: Not a valid request type: {request_type}"
 
         if request_type in ["POST", "PUT"]:
-            assert data, f"pcaw: 'data' not specified for {request_type} request"
+            assert data, f"pcaw: request: 'data' not specified for {request_type} request"
 
-        print(f"pcaw: {request_type} Requesting URL: {url}")
+        print(f"pcaw: request: {request_type} Requesting URL: {url}")
 
         args = {"url": url, "headers": self.headers}
         if request_type == "POST":
@@ -217,21 +219,21 @@ class Pcaw(Quizzes):
             r = requests.delete(**args)
 
         if "errors" in r.text:
-            print("pcaw: Canvas API returned error(s):")
+            print("pcaw: request: Canvas API returned error(s):")
             self.json_pretty_print(r.text)
 
         if self.show_responses:
-            print("pcaw: Response:")
+            print("pcaw: request: Response:")
             self.json_pretty_print(r.text)
 
         if r.status_code != requests.codes.ok:
-            print("pcaw: ERROR: Bad Response:")
+            print("pcaw: request: ERROR: Bad Response:")
             self.json_pretty_print(r.text)
 
         assert r.status_code == requests.codes.ok, "pcaw: Request not OK, " \
             f"response code: {r.status_code}"
 
-        print(f"pcaw: Success; {request_type} request to '{url}' sucessful")
+        print(f"pcaw: request: Success; {request_type} request to '{url}' sucessful")
         return r
 
     def genericPOST(self, endpoint, data):
@@ -258,7 +260,7 @@ class Pcaw(Quizzes):
         / handles pagination
         """
         endpoint = urljoin(self.domain, endpoint)
-        print(f"pcaw: paginating: {endpoint}")
+        print(f"pcaw: paginate: Paginating: {endpoint}")
 
         per_page_url = endpoint + f"?per_page={per_page}"
         r = requests.get(per_page_url, headers=self.headers, params=params)
@@ -280,20 +282,20 @@ class Pcaw(Quizzes):
         try:
             raw = r.json()
         except JSONDecodeError as e:
-            print(f"ERROR: The response is not valid JSON. {e}")
+            print(f"pcaw: paginate: ERROR: The response is not valid JSON. {e}")
             raise
         except Exception as e:
-            print(f"ERROR: There was an unexpected error: {e}")
+            print(f"pcaw: paginate: ERROR: There was an unexpected error: {e}")
             raise
 
         item_set = []
 
-        print('pcaw: paginating: Going through first page...')
+        print('pcaw: paginate: Going through first page...')
         for item in raw:
             # print(item)
             item_set.append(item)
 
-        print('pcaw: paginating: Going through the next pages...')
+        print('pcaw: paginate: Going through the next pages...')
         while r.links['current']['url'] != r.links['last']['url']:
             r = requests.get(r.links['next']['url'], headers=self.headers)
             raw = r.json()
@@ -302,9 +304,9 @@ class Pcaw(Quizzes):
                 item_set.append(item)
 
         if not item_set:
-            print(f"pcaw: There were no objects found at this endpoint: {r.url}")
+            print(f"pcaw: paginate: There were no objects found at this endpoint: {r.url}")
 
-        print(f"pcaw: Success; Sucessfully paginated endpoint: {r.url}")
+        print(f"pcaw: paginate: Success; Sucessfully paginated endpoint: {r.url}")
         return item_set
 
     def check_type(self, variable_name, object_to_check, intended_type):
