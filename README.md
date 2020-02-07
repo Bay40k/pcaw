@@ -75,6 +75,8 @@ quiz = canvasAPI.create_quiz(**details)
 #### Generate quiz object from existing quiz using `get_quiz()` method
 
 ```python
+canvasAPI = Pcaw(domain, access_token)
+
 quiz = canvasAPI.get_quiz(quiz_id=7670, course_id=15)
 
 # Additional parameters are optional (this applies to all pcaw Quizzes methods)
