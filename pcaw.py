@@ -121,13 +121,13 @@ class Quizzes:
         questions_endpoint = urljoin(self.domain, full_endpoint)
 
         question_types = ["calculated_question", "essay_question",
-                            "file_upload_question",
-                            "fill_in_multiple_blanks_question",
-                            "matching_question", "multiple_answers_question",
-                            "multiple_choice_question",
-                            "multiple_dropdowns_question",
-                            "numerical_question", "short_answer_question",
-                            "text_only_question", 'true_false_question']
+                          "file_upload_question",
+                          "fill_in_multiple_blanks_question",
+                          "matching_question", "multiple_answers_question",
+                          "multiple_choice_question",
+                          "multiple_dropdowns_question",
+                          "numerical_question", "short_answer_question",
+                          "text_only_question", 'true_false_question']
 
         assert q_type in question_types, \
             f"pcaw: create_question: Not a valid question type: {q_type}"
@@ -316,4 +316,3 @@ class Pcaw(Quizzes):
         assert isinstance(object_to_check, intended_type), \
             f"'{variable_name}' must be type '{intended_type.__name__}', " \
             f"instead it's: '{type(object_to_check).__name__}'"
-
