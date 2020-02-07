@@ -72,7 +72,7 @@ details = {
 quiz = canvasAPI.create_quiz(**details)
 ```
 
-### Generate quiz object from existing quiz
+#### Generate quiz object from existing quiz using `get_quiz()` method
 
 ```python
 quiz = canvasAPI.get_quiz(quiz_id=7670, course_id=15)
