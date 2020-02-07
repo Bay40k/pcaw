@@ -7,6 +7,8 @@ pcaw makes accessing and using the Canvas LMS REST API through Python a bit more
 Initialize pcaw with your Canvas insance's domain and API  access token:
 
 ```python
+from pcaw import Pcaw
+
 domain = '<canvas>' # e.g. 'canvas.instructure.com'
 access_token = '<token_goes_here>'
 
