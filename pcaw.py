@@ -36,7 +36,7 @@ class Quizzes:
         self.check_type("q_type", q_type, str)
         self.check_type("points", points, int)
         self.check_type("additional_params", additional_params, dict)
-        print(f"ADDN PARAMS {additional_params}")
+        print(f"Additional parameters: {additional_params}")
 
         questions_endpoint = urljoin(self.domain, f"courses/{course_id}/quizzes/{quiz_id}/questions")
 
