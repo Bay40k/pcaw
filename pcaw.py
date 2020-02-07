@@ -13,6 +13,7 @@ import urllib.parse
 #           in the "Pcaw" class, e.g. 'Pcaw(Quizzes):'
 #       - change genericPOST method name to just 'post'
 #       - make QuizObject class
+#       - move mixin classes to separate files?
 
 
 class Quizzes:
