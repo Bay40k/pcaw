@@ -12,11 +12,42 @@ import urllib.parse
 #       - implement endpoints as classes, with mixins for them
 #           in the "Pcaw" class, e.g. 'Pcaw(Quizzes):'
 #       - implement get_questions method in Quizzes module
+#       - change genericPOST method name to just 'post'
 
 
 class Quizzes:
     def __init__(self):
         pass
+
+    '''def get_quiz(self, quiz_id, course_id,
+                 account_id, additional_params={}):
+        self.check_type("quiz_id", quiz_id, int)
+        self.check_type("course_id", course_id, int)
+        self.check_type("additional_params", additional_params, dict)
+
+
+        if account_id:
+            self.check_type("account_id", account_id, int)
+            full_endpoint = f"accounts/{account_id}/courses" \
+                f"/{course_id}/quizzes/{quiz_id}"
+        else:
+            full_endpoint = f"courses/{course_id}/quizzes/{quiz_id}"
+
+        quiz_url = urljoin(self.domain, full_endpoint)
+
+        full_params = {**params, **additional_params}
+        print("Additional parameters: {additional_params}")
+        pprint(full_params, width=1)
+
+        response = self.genericPOST(quiz_url, full_params)
+
+        self.id = response["id"]
+        self.html_url = response["html_url"]
+        self.course_id = course_id
+
+        print(f"pcaw: Quiz object URL: {self.html_url}")
+
+        return self'''
 
     def create_quiz(self, course_id, title,
                     description, quiz_type, account_id=None,
@@ -157,22 +188,47 @@ class Pcaw(Quizzes):
                 print("ERROR: The response is not valid JSON. Possibly HTML?"
                       "\nEnable show_responses to see raw response")
 
-    def genericPOST(self, endpoint, data):
+    def request(self, url, request_type, params=None, data=None):
         """
-        Generic POST request function that passes your desired parameters to a
-        desired endpoint, using self.headers
+        Generic HTTP request function that passes your desired parameters to a
+        desired URL, using self.headers
+
+        Returns HTTP response object
 
         Enable show_responses to print the HTTP responses from this method
         """
-        endpoint = urljoin(self.domain, endpoint)
-        print(f"pcaw: Requesting URL: {endpoint}")
+        self.check_type("url", url, str)
+        if params:
+            self.check_type("params", params, dict)
+        if data:
+            self.check_type("data", data, dict)
+        self.check_type("request_type", request_type, str)
+        request_type = request_type.upper()
 
-        r = requests.post(endpoint, data=data, headers=self.headers)
+        # Currently supported types
+        request_types = ["GET", "POST", "PUT", "DELETE"]
+
+        assert request_type in request_types, \
+            f"pcaw: Not a valid request type: {request_type}"
+
+        if request_type in ["POST", "PUT"]:
+            assert data, f"pcaw: 'data' not specified for {request_type} request"
+
+        print(f"pcaw: {request_type} Requesting URL: {url}")
+
+        args = {"url": url, "headers": self.headers}
+        if request_type == "POST":
+            r = requests.post(data=data, **args)
+        elif request_type == "PUT":
+            r = requests.put(data=data, **args)
+        elif request_type == "GET":
+            r = requests.get(args)
+        elif request_type == "DELETE":
+            r = requests.delete(args)
 
         if "errors" in r.text:
             print("pcaw: Canvas API returned error(s):")
-            if not self.show_responses:
-                self.json_pretty_print(r.text)
+            self.json_pretty_print(r.text)
 
         if self.show_responses:
             print("pcaw: Response:")
@@ -185,7 +241,25 @@ class Pcaw(Quizzes):
         assert r.status_code == requests.codes.ok, "pcaw: Request not OK, " \
             f"response code: {r.status_code}"
 
-        print(f"pcaw: Success; POST request to '{endpoint}' sucessful")
+        print(f"pcaw: Success; {request_type} request to '{url}' sucessful")
+        return r
+
+    def genericPOST(self, endpoint, data):
+        """
+        Generic POST request function that passes your desired
+        parameters (data) to a desired endpoint, using self.headers
+
+        Enable show_responses to print the HTTP responses from this method
+
+        Returns JSON object of response
+        """
+        self.check_type("data", data, dict)
+        self.check_type("endpoint", endpoint, str)
+
+        url = urljoin(self.domain, endpoint)
+
+        r = self.request(url, request_type="POST", data=data)
+
         return r.json()
 
     def paginate(self, endpoint, params=None, per_page=100):
