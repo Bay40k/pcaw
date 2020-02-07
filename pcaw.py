@@ -17,8 +17,54 @@ class Quizzes:
     def __init__(self):
         pass
 
-    def create_quiz(self, course_id):
-        pass
+    def create_quiz(self, course_id, title,
+                    description, quiz_type, account_id=None, additional_params={}):
+        """
+        Creates a quiz
+
+        POST /api/v1/courses/:course_id/quizzes
+        https://canvas.instructure.com/doc/api/quizzes.html#method.quizzes/quizzes_api.create
+        """
+        self.check_type("course_id", course_id, int)
+        self.check_type("title", title, str)
+        self.check_type("description", description, str)
+        self.check_type("quiz_type", quiz_type, str)
+        self.check_type("additional_params", additional_params, dict)
+        print(f"Additional parameters: {additional_params}")
+
+        quiz_types = ["practice_quiz", "assignment", "graded_survey", "survey"]
+
+        assert quiz_type in quiz_types, \
+            f"pcaw: Not a valid quiz type: {quiz_type}"
+
+        if account_id:
+            full_endpoint = f"accounts/{account_id}/courses/{course_id}/quizzes/"
+        else:
+            full_endpoint = f"courses/{course_id}/quizzes/"
+
+        quizzes_endpoint = urljoin(self.domain, full_endpoint)
+
+        params = {
+            "quiz[title]": title,
+            "quiz[description]": description,
+            "quiz[quiz_type]": quiz_type
+        }
+
+        print(f"pcaw: Creating '{quiz_type}' quiz at: {quizzes_endpoint}")
+
+        full_params = {**params, **additional_params}
+        print("Parameters:")
+        pprint(full_params, width=1)
+
+        response = self.genericPOST(quizzes_endpoint, full_params)
+
+        self.id = response["id"]
+        self.html_url = response["html_url"]
+        self.course_id = course_id
+
+        print(f"pcaw: New quiz URL: {self.html_url}")
+
+        return self
 
     def create_question(self, course_id, quiz_id, name, text, q_type,
                         points=1, additional_params={}):
@@ -49,7 +95,8 @@ class Quizzes:
                             "numerical_question", "short_answer_question",
                             "text_only_question", 'true_false_question']
 
-        assert q_type in question_types, f"Not a valid question type: {q_type}"
+        assert q_type in question_types, \
+            f"pcaw: Not a valid question type: {q_type}"
 
         params = {
             "question[question_name]": name,
@@ -121,6 +168,7 @@ class Pcaw(Quizzes):
             f"response code: {r.status_code}"
 
         print(f"pcaw: Success; POST request to '{endpoint}' sucessful")
+        return r.json()
 
     def paginate(self, endpoint, params=None, per_page=100):
         """
