@@ -9,10 +9,10 @@ import urllib.parse
 # Prototype, by Bailey M.
 # TODO: - implement logger
 #       - verify __init__ 'domain' variable URL formatting
-#       - implement endpoints as classes, with mixins for them
+#       - in progress - implement endpoints as classes, with mixins for them
 #           in the "Pcaw" class, e.g. 'Pcaw(Quizzes):'
-#       - implement get_questions method in Quizzes module
 #       - change genericPOST method name to just 'post'
+#       - make QuizObject class
 
 
 class Quizzes:

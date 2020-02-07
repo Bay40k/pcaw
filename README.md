@@ -52,25 +52,39 @@ requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
 
 ### Quizzes module
 
-#### Creating a quiz using create_quiz method
+#### Creating a quiz using `create_quiz()` method
 
 ```python
 canvasAPI = Pcaw(domain, access_token)
 
+canvasAPI.create_quiz(course_id=1234, title="Quiz title",
+                      description="Quiz description", quiz_type="graded_quiz")
+
+# Alternatively:
 details = {
     "course_id": 1234,
     "title": "Quiz title",
     "description": "Quiz description",
     "quiz_type": "graded_quiz",
-    # Optional
-    "account_id": 1234
 }
 
-# Referencable quiz object
+# Referencable quiz object AKA pcaw quiz object
 quiz = canvasAPI.create_quiz(**details)
 ```
 
-#### Creating a quiz question using create_question method
+### Generate quiz object from existing quiz
+
+```python
+quiz = canvasAPI.get_quiz(quiz_id=7670, course_id=15)
+
+# Additional parameters are optional (this applies to all pcaw Quizzes methods)
+addn_params = {'example': "parameter"}
+quiz = canvasAPI.get_quiz(quiz_id=7670, course_id=15, additional_parameters=addn_params)
+
+quiz.id # Returns: 7670
+```
+
+#### Creating a quiz question using `create_question()` method
 
 ```python
 canvasAPI = Pcaw(domain, access_token)
@@ -78,33 +92,28 @@ canvasAPI = Pcaw(domain, access_token)
 course_id = 1234
 quiz_id = 1234
 
-# Additional parameters are optional
+# Use quiz object:
+course_id = quiz.course_id
+quiz_id = quiz.id
+
 addn_params = {'question[neutral_comments]': "Neutral Comment"}
 
 canvasAPI.create_question(course_id=course_id, quiz_id=quiz_id,
-                          "Title", "Text", "essay_question", addn_params, points=10)
-
-# You can pass the quiz object from before:
-canvasAPI.create_question(quiz_object=quiz,
-                          "Title", "Text", "essay_question", addn_params, points=10)
+                          title="Title", text="Text", q_type="essay_question",
+                          additional_params=addn_params, points=10)
 # Alternatively:
 question_details = {
     "course_id": course_id,
     "quiz_id": quiz_id,
-    "name": "Title",
+    "title": "Title",
     "text": "Text",
     "q_type": "essay_question",
     # Optional
-    "account_id": 1234,
-    "additional_params": addn_params,
-    "points": 10
+    "points": 10, # Defaults to 1
+    "additional_params": addn_params
 }
 
 canvasAPI.create_question(**question_details)
-
-# or
-
-canvasAPI.create_question(quiz_object=quiz, **question_details)
 ```
 
 ### More examples
@@ -114,8 +123,11 @@ canvasAPI.create_question(quiz_object=quiz, **question_details)
 ```python
 canvasAPI = Pcaw(domain, access_token)
 
-endpoint = 'accounts/x/courses'
-params = {'course[name]': "Course Name", 'course[course_code]': "Course_Code_1234"}
+account_id = 1234
+endpoint = f'accounts/{account_id}/courses'
+
+params = {'course[name]': "Course Name",
+          'course[course_code]': "Course_Code_1234"}
 
 canvasAPI.genericPOST(endpoint, params)
 ```
@@ -125,7 +137,7 @@ canvasAPI.genericPOST(endpoint, params)
 ```python
 canvasAPI = Pcaw(domain, access_token)
 
-course_id = 'xxxxxxx'
+course_id = 1234
 endpoint = f'courses/{course_id}/assignments'
 
 params = {'example': "parameter"}
