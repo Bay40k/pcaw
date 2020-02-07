@@ -50,7 +50,7 @@ requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
 
 ### Quizzes module
 
-### Creating a quiz using create_quiz method
+#### Creating a quiz using create_quiz method
 
 ```python
 canvasAPI = Pcaw(domain, access_token)
