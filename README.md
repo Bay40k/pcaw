@@ -1,6 +1,6 @@
 # pcaw (Python Canvas API Wrapper)
 
-pcaw makes accessing and using the Canvas LMS REST API through Python a bit more convenient.
+pcaw makes accessing and using the Canvas LMS REST API through Python simple, allowing for easy creation of Canvas API tools.
 
 ## Usage
 
