@@ -79,10 +79,6 @@ canvasAPI = Pcaw(domain, access_token)
 
 quiz = canvasAPI.get_quiz(quiz_id=7670, course_id=15)
 
-# Additional parameters are optional (this applies to all pcaw Quizzes methods)
-addn_params = {'example': "parameter"}
-quiz = canvasAPI.get_quiz(quiz_id=7670, course_id=15, additional_parameters=addn_params)
-
 quiz.id # Returns: 7670
 ```
 
@@ -98,6 +94,8 @@ quiz_id = 1234
 course_id = quiz.course_id
 quiz_id = quiz.id
 
+
+# Additional parameters are optional (this applies to all pcaw Quizzes methods)
 addn_params = {'question[neutral_comments]': "Neutral Comment"}
 
 canvasAPI.create_question(course_id=course_id, quiz_id=quiz_id,
