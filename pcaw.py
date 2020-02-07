@@ -11,6 +11,7 @@ import urllib.parse
 #       - verify __init__ 'domain' variable URL formatting
 #       - implement endpoints as classes, with mixins for them
 #           in the "Pcaw" class, e.g. 'Pcaw(Quizzes):'
+#       - implement get_questions method in Quizzes module
 
 
 class Quizzes:
@@ -18,7 +19,8 @@ class Quizzes:
         pass
 
     def create_quiz(self, course_id, title,
-                    description, quiz_type, account_id=None, additional_params={}):
+                    description, quiz_type, account_id=None,
+                    additional_params={}):
         """
         Creates a quiz
 
@@ -66,8 +68,10 @@ class Quizzes:
 
         return self
 
-    def create_question(self, course_id, quiz_id, name, text, q_type,
-                        points=1, additional_params={}):
+    def create_question(self, title, text, q_type, account_id=None,
+                        course_id=None, quiz_id=None,
+                        points=1, quiz_object=None,
+                        additional_params={}):
         """
         Creates a quiz question
 
@@ -75,16 +79,29 @@ class Quizzes:
         https://canvas.instructure.com/doc/api/quiz_questions.html#method.quizzes/quiz_questions.create
         """
 
+        if quiz_object:
+            course_id = quiz_object.course_id
+            quiz_id = quiz_object.id
+
+        assert course_id, "pcaw: create question: Course ID not defined"
+        assert quiz_id, "pcaw: create question: Quiz ID not defined"
+
+        self.check_type("account_id", account_id, int)
         self.check_type("course_id", course_id, int)
         self.check_type("quiz_id", quiz_id, int)
-        self.check_type("name", name, str)
+        self.check_type("title", title, str)
         self.check_type("text", text, str)
         self.check_type("q_type", q_type, str)
         self.check_type("points", points, int)
         self.check_type("additional_params", additional_params, dict)
         print(f"Additional parameters: {additional_params}")
 
-        questions_endpoint = urljoin(self.domain, f"courses/{course_id}/quizzes/{quiz_id}/questions")
+        if account_id:
+            full_endpoint = f"accounts/{account_id}courses/{course_id}/quizzes/{quiz_id}/questions"
+        else:
+            full_endpoint = f"courses/{course_id}/quizzes/{quiz_id}/questions"
+
+        questions_endpoint = urljoin(self.domain, full_endpoint)
 
         question_types = ["calculated_question", "essay_question",
                             "file_upload_question",
@@ -99,7 +116,7 @@ class Quizzes:
             f"pcaw: Not a valid question type: {q_type}"
 
         params = {
-            "question[question_name]": name,
+            "question[question_name]": title,
             "question[question_text]": text,
             "question[question_type]": q_type,
             "question[points_possible]": points

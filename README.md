@@ -58,10 +58,12 @@ requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
 canvasAPI = Pcaw(domain, access_token)
 
 details = {
-    "course_id": course_id,
+    "course_id": 1234,
     "title": "Quiz title",
     "description": "Quiz description",
-    "quiz_type": "graded_quiz"
+    "quiz_type": "graded_quiz",
+    # Optional
+    "account_id": 1234
 }
 
 # Referencable quiz object
@@ -76,13 +78,14 @@ canvasAPI = Pcaw(domain, access_token)
 course_id = 1234
 quiz_id = 1234
 
-# You can reference a quiz object as well:
-quiz_id = quiz.id
-
 # Additional parameters are optional
 addn_params = {'question[neutral_comments]': "Neutral Comment"}
 
-canvasAPI.create_question(course_id, quiz_id,
+canvasAPI.create_question(course_id=course_id, quiz_id=quiz_id,
+                          "Title", "Text", "essay_question", addn_params, points=10)
+
+# You can pass the quiz object from before:
+canvasAPI.create_question(quiz_object=quiz,
                           "Title", "Text", "essay_question", addn_params, points=10)
 # Alternatively:
 question_details = {
@@ -91,11 +94,17 @@ question_details = {
     "name": "Title",
     "text": "Text",
     "q_type": "essay_question",
+    # Optional
+    "account_id": 1234,
     "additional_params": addn_params,
     "points": 10
 }
 
 canvasAPI.create_question(**question_details)
+
+# or
+
+canvasAPI.create_question(quiz_object=quiz, **question_details)
 ```
 
 ### More examples
