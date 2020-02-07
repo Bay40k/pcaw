@@ -19,41 +19,43 @@ class Quizzes:
     def __init__(self):
         pass
 
-    '''def get_quiz(self, quiz_id, course_id,
-                 account_id, additional_params={}):
+    def get_quiz(self, quiz_id, course_id, additional_params={}):
+        """
+        Gets a single quiz, returns pcaw quiz object
+
+        GET /api/v1/courses/:course_id/quizzes/:id
+        https://canvas.instructure.com/doc/api/quizzes.html#method.quizzes/quizzes_api.show
+        """
         self.check_type("quiz_id", quiz_id, int)
         self.check_type("course_id", course_id, int)
         self.check_type("additional_params", additional_params, dict)
 
-
-        if account_id:
-            self.check_type("account_id", account_id, int)
-            full_endpoint = f"accounts/{account_id}/courses" \
-                f"/{course_id}/quizzes/{quiz_id}"
-        else:
-            full_endpoint = f"courses/{course_id}/quizzes/{quiz_id}"
+        full_endpoint = f"courses/{course_id}/quizzes/{quiz_id}"
 
         quiz_url = urljoin(self.domain, full_endpoint)
 
-        full_params = {**params, **additional_params}
-        print("Additional parameters: {additional_params}")
-        pprint(full_params, width=1)
+        print(f"pcaw: Generating quiz object from: {quiz_url}")
+        if additional_params:
+            print(f"Additional parameters:")
+            pprint(additional_params, width=50)
 
-        response = self.genericPOST(quiz_url, full_params)
+        response = self.request(quiz_url, "GET", data=additional_params)
 
+        self.json_pretty_print(response.text, check=True)
+
+        response = response.json()
         self.id = response["id"]
         self.html_url = response["html_url"]
         self.course_id = course_id
 
-        print(f"pcaw: Quiz object URL: {self.html_url}")
+        print(f"pcaw: get_quiz: Success; Quiz object URL: {self.html_url}")
 
-        return self'''
+        return self
 
-    def create_quiz(self, course_id, title,
-                    description, quiz_type, account_id=None,
+    def create_quiz(self, course_id, title, description, quiz_type,
                     additional_params={}):
         """
-        Creates a quiz
+        Creates a quiz, returns pcaw quiz object
 
         POST /api/v1/courses/:course_id/quizzes
         https://canvas.instructure.com/doc/api/quizzes.html#method.quizzes/quizzes_api.create
@@ -63,18 +65,13 @@ class Quizzes:
         self.check_type("description", description, str)
         self.check_type("quiz_type", quiz_type, str)
         self.check_type("additional_params", additional_params, dict)
-        print(f"Additional parameters: {additional_params}")
 
         quiz_types = ["practice_quiz", "assignment", "graded_survey", "survey"]
 
         assert quiz_type in quiz_types, \
             f"pcaw: Not a valid quiz type: {quiz_type}"
 
-        if account_id:
-            self.check_type("account_id", account_id, int)
-            full_endpoint = f"accounts/{account_id}/courses/{course_id}/quizzes/"
-        else:
-            full_endpoint = f"courses/{course_id}/quizzes/"
+        full_endpoint = f"courses/{course_id}/quizzes/"
 
         quizzes_endpoint = urljoin(self.domain, full_endpoint)
 
@@ -84,11 +81,11 @@ class Quizzes:
             "quiz[quiz_type]": quiz_type
         }
 
-        print(f"pcaw: Creating '{quiz_type}' quiz at: {quizzes_endpoint}")
+        print(f"pcaw: create_quiz: Creating '{quiz_type}' quiz at: {quizzes_endpoint}")
 
         full_params = {**params, **additional_params}
-        print("Parameters:")
-        pprint(full_params, width=1)
+        print("Final parameters:")
+        pprint(full_params, width=50)
 
         response = self.genericPOST(quizzes_endpoint, full_params)
 
@@ -96,28 +93,18 @@ class Quizzes:
         self.html_url = response["html_url"]
         self.course_id = course_id
 
-        print(f"pcaw: New quiz URL: {self.html_url}")
+        print(f"pcaw: create_quiz: New quiz URL: {self.html_url}")
 
         return self
 
-    def create_question(self, title, text, q_type, account_id=None,
-                        course_id=None, quiz_id=None,
-                        points=1, quiz_object=None,
-                        additional_params={}):
+    def create_question(self, title, text, q_type, quiz_id, course_id,
+                        points=1, additional_params={}):
         """
         Creates a quiz question
 
         POST /api/v1/courses/:course_id/quizzes/:quiz_id/questions
         https://canvas.instructure.com/doc/api/quiz_questions.html#method.quizzes/quiz_questions.create
         """
-
-        if quiz_object:
-            course_id = quiz_object.course_id
-            quiz_id = quiz_object.id
-
-        assert course_id, "pcaw: create question: Course ID not defined"
-        assert quiz_id, "pcaw: create question: Quiz ID not defined"
-
         self.check_type("course_id", course_id, int)
         self.check_type("quiz_id", quiz_id, int)
         self.check_type("title", title, str)
@@ -125,13 +112,8 @@ class Quizzes:
         self.check_type("q_type", q_type, str)
         self.check_type("points", points, int)
         self.check_type("additional_params", additional_params, dict)
-        print(f"Additional parameters: {additional_params}")
 
-        if account_id:
-            self.check_type("account_id", account_id, int)
-            full_endpoint = f"accounts/{account_id}courses/{course_id}/quizzes/{quiz_id}/questions"
-        else:
-            full_endpoint = f"courses/{course_id}/quizzes/{quiz_id}/questions"
+        full_endpoint = f"courses/{course_id}/quizzes/{quiz_id}/questions"
 
         questions_endpoint = urljoin(self.domain, full_endpoint)
 
@@ -145,7 +127,7 @@ class Quizzes:
                             "text_only_question", 'true_false_question']
 
         assert q_type in question_types, \
-            f"pcaw: Not a valid question type: {q_type}"
+            f"pcaw: create_question: Not a valid question type: {q_type}"
 
         params = {
             "question[question_name]": title,
@@ -154,11 +136,11 @@ class Quizzes:
             "question[points_possible]": points
         }
 
-        print(f"pcaw: Creating '{q_type}' question at: {questions_endpoint}")
+        print(f"pcaw: create_question: Creating '{q_type}' question at: {questions_endpoint}")
 
         full_params = {**params, **additional_params}
-        print("Parameters:")
-        pprint(full_params, width=1)
+        print("Final parameters:")
+        pprint(full_params, width=50)
 
         self.genericPOST(questions_endpoint, full_params)
 
@@ -175,11 +157,20 @@ class Pcaw(Quizzes):
 
         print(f"pcaw: Initalized; Domain: {self.domain}")
 
-    def json_pretty_print(self, json_string):
+    def json_pretty_print(self, json_string, check=False):
+        """
+        Nicely prints a JSON object
+
+        Enable "check" to only check if the string
+        is valid JSON, without printing
+        """
         try:
             json_loads = json.loads(json_string)
             json_dumps = json.dumps(json_loads, indent=2)
-            print(json_dumps)
+            if not check:
+                print(json_dumps)
+            else:
+                return True
         except JSONDecodeError:
             if self.show_responses:
                 print("ERROR: The response is not valid JSON. Possibly HTML?"
@@ -188,7 +179,7 @@ class Pcaw(Quizzes):
                 print("ERROR: The response is not valid JSON. Possibly HTML?"
                       "\nEnable show_responses to see raw response")
 
-    def request(self, url, request_type, params=None, data=None):
+    def request(self, url, request_type, data=None):
         """
         Generic HTTP request function that passes your desired parameters to a
         desired URL, using self.headers
@@ -198,8 +189,6 @@ class Pcaw(Quizzes):
         Enable show_responses to print the HTTP responses from this method
         """
         self.check_type("url", url, str)
-        if params:
-            self.check_type("params", params, dict)
         if data:
             self.check_type("data", data, dict)
         self.check_type("request_type", request_type, str)
@@ -222,9 +211,9 @@ class Pcaw(Quizzes):
         elif request_type == "PUT":
             r = requests.put(data=data, **args)
         elif request_type == "GET":
-            r = requests.get(args)
+            r = requests.get(**args)
         elif request_type == "DELETE":
-            r = requests.delete(args)
+            r = requests.delete(**args)
 
         if "errors" in r.text:
             print("pcaw: Canvas API returned error(s):")
