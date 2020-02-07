@@ -48,13 +48,34 @@ requests.get(url, headers=canvasAPI.headers)
 requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
 ```
 
-### More examples
+### Quizzes module
+
+### Creating a quiz using create_quiz method
+
+```python
+canvasAPI = Pcaw(domain, access_token)
+
+details = {
+    "course_id": course_id,
+    "title": "Quiz title",
+    "description": "Quiz description",
+    "quiz_type": "graded_quiz"
+}
+
+# Referencable quiz object
+quiz = canvasAPI.create_quiz(**details)
+```
 
 #### Creating a quiz question using create_question method
 
 ```python
+canvasAPI = Pcaw(domain, access_token)
+
 course_id = 1234
 quiz_id = 1234
+
+# You can reference a quiz object as well:
+quiz_id = quiz.id
 
 # Additional parameters are optional
 addn_params = {'question[neutral_comments]': "Neutral Comment"}
@@ -70,19 +91,24 @@ quiz_details = {
     "additional_params": addn_params,
     "points": 10
 }
+
 canvasAPI.create_question(**quiz_details)
 ```
+
+### More examples
 
 #### Creating a course using genericPOST method
 
 ```python
+canvasAPI = Pcaw(domain, access_token)
+
 endpoint = 'accounts/x/courses'
 params = {'course[name]': "Course Name", 'course[course_code]': "Course_Code_1234"}
 
 canvasAPI.genericPOST(endpoint, params)
 ```
 
-### Getting all assignment IDs in a course
+#### Getting all assignment IDs in a course
 
 ```python
 canvasAPI = Pcaw(domain, access_token)
