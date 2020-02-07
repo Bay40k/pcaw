@@ -40,6 +40,7 @@ class Quizzes:
             f"pcaw: Not a valid quiz type: {quiz_type}"
 
         if account_id:
+            self.check_type("account_id", account_id, int)
             full_endpoint = f"accounts/{account_id}/courses/{course_id}/quizzes/"
         else:
             full_endpoint = f"courses/{course_id}/quizzes/"
@@ -86,7 +87,6 @@ class Quizzes:
         assert course_id, "pcaw: create question: Course ID not defined"
         assert quiz_id, "pcaw: create question: Quiz ID not defined"
 
-        self.check_type("account_id", account_id, int)
         self.check_type("course_id", course_id, int)
         self.check_type("quiz_id", quiz_id, int)
         self.check_type("title", title, str)
@@ -97,6 +97,7 @@ class Quizzes:
         print(f"Additional parameters: {additional_params}")
 
         if account_id:
+            self.check_type("account_id", account_id, int)
             full_endpoint = f"accounts/{account_id}courses/{course_id}/quizzes/{quiz_id}/questions"
         else:
             full_endpoint = f"courses/{course_id}/quizzes/{quiz_id}/questions"
