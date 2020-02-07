@@ -7,11 +7,67 @@ import urllib.parse
 
 # Python Canvas API Wrapper (pcaw)
 # Prototype, by Bailey M.
-# TODO: implement logger
-#       verify __init__ 'domain' variable URL formatting
+# TODO: - implement logger
+#       - verify __init__ 'domain' variable URL formatting
+#       - implement endpoints as classes, with mixins for them
+#           in the "Pcaw" class, e.g. 'Pcaw(Quizzes):'
 
 
-class Pcaw:
+class Quizzes:
+    def __init__(self):
+        pass
+
+    def create_quiz(self, course_id):
+        pass
+
+    def create_question(self, course_id, quiz_id, name, text, q_type,
+                        points=1, additional_params={}):
+        """
+        Creates a quiz question
+
+        POST /api/v1/courses/:course_id/quizzes/:quiz_id/questions
+        https://canvas.instructure.com/doc/api/quiz_questions.html#method.quizzes/quiz_questions.create
+        """
+
+        self.check_type("course_id", course_id, int)
+        self.check_type("quiz_id", quiz_id, int)
+        self.check_type("name", name, str)
+        self.check_type("text", text, str)
+        self.check_type("q_type", q_type, str)
+        self.check_type("points", points, int)
+        self.check_type("additional_params", additional_params, dict)
+        print(f"ADDN PARAMS {additional_params}")
+
+        questions_endpoint = urljoin(self.domain, f"courses/{course_id}/quizzes/{quiz_id}/questions")
+
+        question_types = ["calculated_question", "essay_question",
+                            "file_upload_question",
+                            "fill_in_multiple_blanks_question",
+                            "matching_question", "multiple_answers_question",
+                            "multiple_choice_question",
+                            "multiple_dropdowns_question",
+                            "numerical_question", "short_answer_question",
+                            "text_only_question", 'true_false_question']
+
+        assert q_type in question_types, f"Not a valid question type: {q_type}"
+
+        params = {
+            "question[question_name]": name,
+            "question[question_text]": text,
+            "question[question_type]": q_type,
+            "question[points_possible]": points
+        }
+
+        print(f"pcaw: Creating '{q_type}' question at: {questions_endpoint}")
+
+        full_params = {**params, **additional_params}
+        print("Parameters:")
+        pprint(full_params, width=1)
+
+        self.genericPOST(questions_endpoint, full_params)
+
+
+class Pcaw(Quizzes):
     def __init__(self, domain, access_token, show_responses=False):
         self.headers = {'Authorization': f"Bearer {access_token}"}
         self.access_token = access_token
@@ -129,46 +185,3 @@ class Pcaw:
             f"'{variable_name}' must be type '{intended_type.__name__}', " \
             f"instead it's: '{type(object_to_check).__name__}'"
 
-    def create_question(self, course_id, quiz_id, name,
-                        text, q_type, addtional_params={}, points=1):
-        """
-        Creates a quiz question
-
-        POST /api/v1/courses/:course_id/quizzes/:quiz_id/questions
-        https://canvas.instructure.com/doc/api/quiz_questions.html#method.quizzes/quiz_questions.create
-        """
-        self.check_type("additional_params", addtional_params, dict)
-        self.check_type("points", points, int)
-        self.check_type("name", name, str)
-        self.check_type("text", text, str)
-        self.check_type("q_type", q_type, str)
-        self.check_type("course_id", course_id, int)
-        self.check_type("quiz_id", quiz_id, int)
-
-        questions_endpoint = urljoin(self.domain, f"courses/{course_id}/quizzes/{quiz_id}/questions")
-
-        question_types = ["calculated_question", "essay_question",
-                          "file_upload_question",
-                          "fill_in_multiple_blanks_question",
-                          "matching_question", "multiple_answers_question",
-                          "multiple_choice_question",
-                          "multiple_dropdowns_question",
-                          "numerical_question", "short_answer_question",
-                          "text_only_question", 'true_false_question']
-
-        assert q_type in question_types, f"Not a valid question type: {q_type}"
-
-        params = {
-            "question[question_name]": name,
-            "question[question_text]": text,
-            "question[question_type]": q_type,
-            "question[points_possible]": points
-        }
-
-        print(f"pcaw: Creating '{q_type}' question at: {questions_endpoint}")
-
-        full_params = {**params, **addtional_params}
-        print("Parameters:")
-        pprint(full_params, width=1)
-
-        self.genericPOST(questions_endpoint, full_params)
