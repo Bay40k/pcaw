@@ -1,7 +1,7 @@
 import requests
 from json.decoder import JSONDecodeError
 import json
-from pprint import pprint
+import pprint
 from requests.compat import urljoin
 import urllib.parse
 
@@ -22,48 +22,50 @@ class Quizzes:
     def __init__(self):
         pass
 
-    def get_quiz(self, quiz_id, course_id, additional_params={}):
+    def get_quiz(self, course_id, quiz_id, params={}):
         """
         Gets a single quiz, returns JSON quiz object
 
         GET /api/v1/courses/:course_id/quizzes/:id
         https://canvas.instructure.com/doc/api/quizzes.html#method.quizzes/quizzes_api.show
         """
-        self.check_type("quiz_id", quiz_id, int)
+        f_name = "get_quiz"
         self.check_type("course_id", course_id, int)
-        self.check_type("additional_params", additional_params, dict)
+        self.check_type("quiz_id", quiz_id, int)
+        self.check_type("params", params, dict)
 
         full_endpoint = f"courses/{course_id}/quizzes/{quiz_id}"
 
         quiz_url = urljoin(self.domain, full_endpoint)
 
-        print(f"pcaw: get_quiz: Generating quiz object from: {quiz_url}")
-        if additional_params:
-            print(f"Additional parameters:")
-            pprint(additional_params, width=50)
+        self.log(f_name, f"Generating quiz object from: {quiz_url}")
+        if params:
+            pretty_params = pprint.pformat(params, width=50)
+            self.log(f_name, f"Additional parameters: \n{pretty_params}")
 
-        response = self.request(quiz_url, "GET", data=additional_params)
+        response = self.request(quiz_url, "GET", params=params)
         response = response.json()
 
         html_url = response["html_url"]
 
-        print(f"pcaw: get_quiz: Success; Quiz object URL: {html_url}")
+        self.log(f_name, f"Success; Quiz object URL: {html_url}")
 
         return response
 
     def create_quiz(self, course_id, title, description, quiz_type,
-                    additional_params={}):
+                    params={}):
         """
         Creates a quiz, returns JSON quiz object
 
         POST /api/v1/courses/:course_id/quizzes
         https://canvas.instructure.com/doc/api/quizzes.html#method.quizzes/quizzes_api.create
         """
+        f_name = "create_quiz"
         self.check_type("course_id", course_id, int)
         self.check_type("title", title, str)
         self.check_type("description", description, str)
         self.check_type("quiz_type", quiz_type, str)
-        self.check_type("additional_params", additional_params, dict)
+        self.check_type("params", params, dict)
 
         quiz_types = ["practice_quiz", "assignment", "graded_survey", "survey"]
 
@@ -74,41 +76,42 @@ class Quizzes:
 
         quizzes_endpoint = urljoin(self.domain, full_endpoint)
 
-        params = {
+        http_params = {
             "quiz[title]": title,
             "quiz[description]": description,
             "quiz[quiz_type]": quiz_type
         }
 
-        print(f"pcaw: create_quiz: Creating '{quiz_type}' quiz at: {quizzes_endpoint}")
+        self.log(f_name, f"Creating '{quiz_type}' quiz at: {quizzes_endpoint}")
 
-        full_params = {**params, **additional_params}
-        print("Final parameters:")
-        pprint(full_params, width=50)
+        full_params = {**http_params, **params}
+        pretty_params = pprint.pformat(full_params, width=50)
+        self.log(f_name, f"Final parameters: \n{pretty_params}")
 
         response = self.genericPOST(quizzes_endpoint, full_params)
 
         html_url = response["html_url"]
 
-        print(f"pcaw: create_quiz: New quiz URL: {html_url}")
+        self.log(f_name, f"pcaw: create_quiz: New quiz URL: {html_url}")
 
         return response
 
     def create_question(self, title, text, q_type, quiz_id, course_id,
-                        points=1, additional_params={}):
+                        points=1, params={}):
         """
         Creates a quiz question
 
         POST /api/v1/courses/:course_id/quizzes/:quiz_id/questions
         https://canvas.instructure.com/doc/api/quiz_questions.html#method.quizzes/quiz_questions.create
         """
+        f_name = "create_question"
         self.check_type("course_id", course_id, int)
         self.check_type("quiz_id", quiz_id, int)
         self.check_type("title", title, str)
         self.check_type("text", text, str)
         self.check_type("q_type", q_type, str)
         self.check_type("points", points, int)
-        self.check_type("additional_params", additional_params, dict)
+        self.check_type("params", params, dict)
 
         full_endpoint = f"courses/{course_id}/quizzes/{quiz_id}/questions"
 
@@ -124,26 +127,30 @@ class Quizzes:
                           "text_only_question", 'true_false_question']
 
         assert q_type in question_types, \
-            f"pcaw: create_question: Not a valid question type: {q_type}"
+            f"FATAL: Not a valid question type: {q_type}"
 
-        params = {
+        http_params = {
             "question[question_name]": title,
             "question[question_text]": text,
             "question[question_type]": q_type,
             "question[points_possible]": points
         }
 
-        print(f"pcaw: create_question: Creating '{q_type}' question at: {questions_endpoint}")
+        self.log(f_name, f"Creating '{q_type}' question at: {questions_endpoint}")
 
-        full_params = {**params, **additional_params}
-        print("Final parameters:")
-        pprint(full_params, width=50)
+        full_params = {**http_params, **params}
+        pretty_params = pprint.pformat(full_params, width=50)
+        self.log(f_name, f"Final parameters: \n{pretty_params}")
 
         self.genericPOST(questions_endpoint, full_params)
 
 
 class Pcaw(Quizzes):
-    def __init__(self, domain, access_token, show_responses=False):
+    def __init__(self, domain, access_token,
+                 show_responses=False, log_level="ERROR"):
+        """
+        Enable show_responses to show HTTP responses from requests method
+        """
         self.headers = {'Authorization': f"Bearer {access_token}"}
         self.access_token = access_token
         self.show_responses = show_responses
@@ -152,42 +159,64 @@ class Pcaw(Quizzes):
                                                  fragment='')
         self.domain = parsed_domain.geturl()
 
-        print(f"pcaw: Initalized; Domain: {self.domain}")
+        self.log_level = log_level
+        self.log("init", f"Initalized; Domain: {self.domain}")
+        self.log("init", "Warning logs enables", "WARNING")
+        self.log("init", "test error", "ERROR")
 
-    def json_pretty_print(self, json_string, check=False):
+    def log(self, f_name, string, log_level="INFO"):
         """
-        Nicely prints a JSON object
+        Method that handles logging
+        """
+        function_name = f_name
+        log_level = log_level.upper()
+        log_levels = ["INFO", "WARNING", "ERROR"]
+
+        assert self.log_level in log_levels, \
+            f"FATAL: Not a valid log_level {log_level}"
+
+        print_log = False
+
+        if log_level in ["INFO", "WARNING"]:
+            if self.log_level == log_level:
+                print_log = True
+
+        if log_level == "ERROR":
+            print_log = True
+
+        if print_log:
+            print(f"pcaw: {log_level}: {function_name}: {string}")
+
+    def format_json(self, json_string):
+        """
+        Takes an ugly JSON string (from a response)
+        and returns a nicely formatted JSON string
 
         Enable "check" to only check if the string
         is valid JSON, without printing
         """
+        f_name = "format_json"  # Used for logging
+
         try:
             json_loads = json.loads(json_string)
             json_dumps = json.dumps(json_loads, indent=2)
-            if not check:
-                print(json_dumps)
-            else:
-                return True
-        except JSONDecodeError:
-            if self.show_responses:
-                print("pcaw: ERROR: The response is not valid JSON. Possibly HTML?"
-                      f"\nRaw Response:\n{json_string}")
-            else:
-                print("pcaw: ERROR: The response is not valid JSON. Possibly HTML?"
-                      "\nEnable show_responses to see raw response")
+            return(json_dumps)
 
-    def request(self, url, request_type, data=None):
+        except JSONDecodeError:
+            self.log(f_name, "The response is not valid JSON. Possibly HTML?"
+                     f"\nRaw Response:\n{json_string}", "ERROR")
+            raise
+
+    def request(self, url, request_type, params={}):
         """
         Generic HTTP request function that passes your desired parameters to a
         desired URL, using self.headers
 
         Returns HTTP response object
-
-        Enable show_responses to print the HTTP responses from this method
         """
+        f_name = "request"
         self.check_type("url", url, str)
-        if data:
-            self.check_type("data", data, dict)
+        self.check_type("params", params, dict)
         self.check_type("request_type", request_type, str)
         request_type = request_type.upper()
 
@@ -195,71 +224,69 @@ class Pcaw(Quizzes):
         request_types = ["GET", "POST", "PUT", "DELETE"]
 
         assert request_type in request_types, \
-            f"pcaw: request: Not a valid request type: {request_type}"
+            f"FATAL: Not a valid request type: {request_type}"
 
         if request_type in ["POST", "PUT"]:
-            assert data, f"pcaw: request: 'data' not specified for {request_type} request"
+            assert params, f"FATAL: 'params' not specified for {request_type} request"
 
-        print(f"pcaw: request: {request_type} Requesting URL: {url}")
+        self.log(f_name, f"{request_type} Requesting URL: {url}")
 
         args = {"url": url, "headers": self.headers}
         if request_type == "POST":
-            r = requests.post(data=data, **args)
+            r = requests.post(data=params, **args)
         elif request_type == "PUT":
-            r = requests.put(data=data, **args)
+            r = requests.put(data=params, **args)
         elif request_type == "GET":
             r = requests.get(**args)
         elif request_type == "DELETE":
             r = requests.delete(**args)
 
+        response = self.format_json(r.text)
+
         if "errors" in r.text:
-            print("pcaw: request: Canvas API returned error(s):")
-            self.json_pretty_print(r.text)
+            self.log(f_name, f"Canvas API returned error(s): \n{response}",
+                     "ERROR")
 
+        assert r.status_code == requests.codes.ok, "FATAL: Request not OK, " \
+            f"response status code: {r.status_code}" \
+            f"\nResponse: \n{response}"
+
+        self.log(f_name, f"Success; {request_type} request to '{url}' sucessful")
         if self.show_responses:
-            print("pcaw: request: Response:")
-            self.json_pretty_print(r.text)
+            self.log(f_name, f"Response: \n{response}")
 
-        if r.status_code != requests.codes.ok:
-            print("pcaw: request: ERROR: Bad Response:")
-            self.json_pretty_print(r.text)
-
-        assert r.status_code == requests.codes.ok, "pcaw: Request not OK, " \
-            f"response code: {r.status_code}"
-
-        print(f"pcaw: request: Success; {request_type} request to '{url}' sucessful")
         return r
 
-    def genericPOST(self, endpoint, data):
+    def genericPOST(self, endpoint, params):
         """
         Generic POST request function that passes your desired
-        parameters (data) to a desired endpoint, using self.headers
-
-        Enable show_responses to print the HTTP responses from this method
+        parameters to a desired endpoint, using self.headers
 
         Returns JSON object of response
         """
-        self.check_type("data", data, dict)
+        self.check_type("params", params, dict)
         self.check_type("endpoint", endpoint, str)
 
         url = urljoin(self.domain, endpoint)
 
-        r = self.request(url, request_type="POST", data=data)
+        r = self.request(url, request_type="POST", params=params)
 
         return r.json()
 
-    def paginate(self, endpoint, params=None, per_page=100):
+    def paginate(self, endpoint, params={}, per_page=100):
         """
         Returns all items/JSON objects (in an array) from an endpoint
         / handles pagination
         """
+        f_name = "paginate"
+        self.log(f_name, f"Paginating: {endpoint}")
+
         endpoint = urljoin(self.domain, endpoint)
-        print(f"pcaw: paginate: Paginating: {endpoint}")
 
         per_page_url = endpoint + f"?per_page={per_page}"
         r = requests.get(per_page_url, headers=self.headers, params=params)
 
-        print(f"Full URL with HTTP params: {r.url}")
+        self.log(f_name, f"Full URL with HTTP params: {r.url}")
 
         assert "/api/v1" in endpoint, \
             "pcaw: /api/v1 was not found in the passed URL."
@@ -276,31 +303,29 @@ class Pcaw(Quizzes):
         try:
             raw = r.json()
         except JSONDecodeError as e:
-            print(f"pcaw: paginate: ERROR: The response is not valid JSON. {e}")
+            self.log(f_name, f"The response is not valid JSON. \n{e}", "ERROR")
             raise
         except Exception as e:
-            print(f"pcaw: paginate: ERROR: There was an unexpected error: {e}")
+            self.log(f_name, f"There was an unexpected error: \n{e}", "ERROR")
             raise
 
         item_set = []
 
-        print('pcaw: paginate: Going through first page...')
+        self.log(f_name, 'Going through first page...')
         for item in raw:
-            # print(item)
             item_set.append(item)
 
-        print('pcaw: paginate: Going through the next pages...')
+        self.log(f_name, 'Going through the next pages...')
         while r.links['current']['url'] != r.links['last']['url']:
             r = requests.get(r.links['next']['url'], headers=self.headers)
             raw = r.json()
             for item in raw:
-                # print(item)
                 item_set.append(item)
 
         if not item_set:
-            print(f"pcaw: paginate: There were no objects found at this endpoint: {r.url}")
+            self.log(f_name, f"There were no objects found at this endpoint: {r.url}", "WARNING")
 
-        print(f"pcaw: paginate: Success; Sucessfully paginated endpoint: {r.url}")
+        self.log(f_name, f"Success; Sucessfully paginated endpoint: {r.url}")
         return item_set
 
     def check_type(self, variable_name, object_to_check, intended_type):
