@@ -24,7 +24,7 @@ class Quizzes:
 
     def get_quiz(self, quiz_id, course_id, additional_params={}):
         """
-        Gets a single quiz, returns pcaw quiz object
+        Gets a single quiz, returns JSON quiz object
 
         GET /api/v1/courses/:course_id/quizzes/:id
         https://canvas.instructure.com/doc/api/quizzes.html#method.quizzes/quizzes_api.show
@@ -43,22 +43,18 @@ class Quizzes:
             pprint(additional_params, width=50)
 
         response = self.request(quiz_url, "GET", data=additional_params)
-
-        self.json_pretty_print(response.text, check=True)
-
         response = response.json()
-        self.id = response["id"]
-        self.html_url = response["html_url"]
-        self.course_id = course_id
 
-        print(f"pcaw: get_quiz: Success; Quiz object URL: {self.html_url}")
+        html_url = response["html_url"]
 
-        return self
+        print(f"pcaw: get_quiz: Success; Quiz object URL: {html_url}")
+
+        return response
 
     def create_quiz(self, course_id, title, description, quiz_type,
                     additional_params={}):
         """
-        Creates a quiz, returns pcaw quiz object
+        Creates a quiz, returns JSON quiz object
 
         POST /api/v1/courses/:course_id/quizzes
         https://canvas.instructure.com/doc/api/quizzes.html#method.quizzes/quizzes_api.create
@@ -92,13 +88,11 @@ class Quizzes:
 
         response = self.genericPOST(quizzes_endpoint, full_params)
 
-        self.id = response["id"]
-        self.html_url = response["html_url"]
-        self.course_id = course_id
+        html_url = response["html_url"]
 
-        print(f"pcaw: create_quiz: New quiz URL: {self.html_url}")
+        print(f"pcaw: create_quiz: New quiz URL: {html_url}")
 
-        return self
+        return response
 
     def create_question(self, title, text, q_type, quiz_id, course_id,
                         points=1, additional_params={}):

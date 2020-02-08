@@ -65,25 +65,25 @@ details = {
     "course_id": 1234,
     "title": "Quiz title",
     "description": "Quiz description",
-    "quiz_type": "graded_quiz",
+    "quiz_type": "assignment", # Graded quiz
 }
 
-# Referencable quiz object AKA pcaw quiz object
+# Referencable JSON Canvas Quiz object
 quiz = canvasAPI.create_quiz(**details)
 ```
 
-#### Generate quiz object from existing quiz using `get_quiz()` method
+#### Generate JSON quiz object from existing quiz using `get_quiz()` method
 
 ```python
 canvasAPI = Pcaw(domain, access_token)
 
 quiz = canvasAPI.get_quiz(quiz_id=7670, course_id=15)
 
+quiz["id"] # Returns: 7670
+
 # Additional parameters are optional (this applies to all pcaw Quizzes methods)
 addn_params = {'example': "parameter"}
 quiz = canvasAPI.get_quiz(quiz_id=7670, course_id=15, additional_parameters=addn_params)
-
-quiz.id # Returns: 7670
 ```
 
 #### Creating a quiz question using `create_question()` method
@@ -95,8 +95,7 @@ course_id = 1234
 quiz_id = 1234
 
 # Use quiz object:
-course_id = quiz.course_id
-quiz_id = quiz.id
+quiz_id = quiz["id"]
 
 addn_params = {'question[neutral_comments]': "Neutral Comment"}
 
