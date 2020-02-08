@@ -74,8 +74,7 @@ requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
 canvasAPI = Pcaw(domain, access_token)
 
 canvasAPI.create_quiz(1234, title="Quiz title",
-                      description="Quiz description",
-                      quiz_type="assignment")
+                      description="Quiz description", quiz_type="assignment")
 
 # Alternatively:
 details = {
