@@ -145,7 +145,7 @@ class Quizzes:
 
 class Pcaw(Quizzes):
     def __init__(self, domain, access_token,
-                 show_responses=False, log_level="ERROR"):
+                 show_responses=False, log_level="WARNING"):
         """
         Enable show_responses to show HTTP responses from requests method
         """
@@ -233,9 +233,9 @@ class Pcaw(Quizzes):
         elif request_type == "PUT":
             r = requests.put(data=params, **args)
         elif request_type == "GET":
-            r = requests.get(**args)
+            r = requests.get(params=params, **args)
         elif request_type == "DELETE":
-            r = requests.delete(**args)
+            r = requests.delete(params=params, **args)
 
         response = self.format_json(r.text)
 
@@ -269,7 +269,7 @@ class Pcaw(Quizzes):
 
         return r.json()
 
-    def paginate(self, endpoint, params={}, per_page=100):
+    def paginate(self, endpoint, per_page=100, params={}):
         """
         Returns all items/JSON objects (in an array) from an endpoint
         / handles pagination

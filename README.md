@@ -15,6 +15,21 @@ access_token = '<token_goes_here>'
 canvasAPI = Pcaw(domain, access_token)
 ```
 
+## Logging
+
+```python
+# There are 3 logging levels:
+# "Error"   - Only print Errors to console
+# "Warning" - Print warnings and errors to console (default)
+# "Info"    - Prints most information to console, useful for debugging
+
+# You can also enable "show_responses" to print HTTP responses to the console
+canvasAPI = Pcaw(domain, access_token, show_responses=True, log_level="info")
+
+# Positional args
+canvasAPI = Pcaw(domain, access_token, True, "info")
+```
+
 ## Examples
 
 ### Pagination
@@ -27,11 +42,12 @@ canvasAPI = Pcaw(domain, access_token)
 endpoint_to_paginate = 'courses/xxxxx/assignments'
 
 # Automatically paginate and return full array of JSON objects from an endpoint:
+# per_page defaults to 100, therefore omittable
 canvasAPI.paginate(endpoint_to_paginate, per_page=100)
 
 # Paginate with HTTP parameters
 params = {"scope": "sent", "as_user_id": user_id}
-canvasAPI.paginate(endpoint_to_paginate, params, per_page=100)
+canvasAPI.paginate(endpoint_to_paginate, params)
 ```
 
 ### Authorization headers
@@ -57,8 +73,9 @@ requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
 ```python
 canvasAPI = Pcaw(domain, access_token)
 
-canvasAPI.create_quiz(course_id=1234, title="Quiz title",
-                      description="Quiz description", quiz_type="graded_quiz")
+canvasAPI.create_quiz(1234, title="Quiz title",
+                      description="Quiz description",
+                      quiz_type="assignment")
 
 # Alternatively:
 details = {
@@ -77,13 +94,14 @@ quiz = canvasAPI.create_quiz(**details)
 ```python
 canvasAPI = Pcaw(domain, access_token)
 
-quiz = canvasAPI.get_quiz(quiz_id=7670, course_id=15)
+# Feel free to omit keyword arguments in favor of positional args
+quiz = canvasAPI.get_quiz(course_id=15, quiz_id=7670)
 
 quiz["id"] # Returns: 7670
 
 # Additional parameters are optional (this applies to all pcaw Quizzes methods)
 addn_params = {'example': "parameter"}
-quiz = canvasAPI.get_quiz(quiz_id=7670, course_id=15, additional_parameters=addn_params)
+quiz = canvasAPI.get_quiz(15, 7670, params=addn_params)
 ```
 
 #### Creating a quiz question using `create_question()` method
@@ -97,13 +115,11 @@ quiz_id = 1234
 # Use quiz object:
 quiz_id = quiz["id"]
 
-
-# Additional parameters are optional (this applies to all pcaw Quizzes methods)
 addn_params = {'question[neutral_comments]': "Neutral Comment"}
 
-canvasAPI.create_question(course_id=course_id, quiz_id=quiz_id,
+canvasAPI.create_question(course_id, quiz_id,
                           title="Title", text="Text", q_type="essay_question",
-                          additional_params=addn_params, points=10)
+                          pontis=10, params=addn_params)
 # Alternatively:
 question_details = {
     "course_id": course_id,
@@ -113,7 +129,7 @@ question_details = {
     "q_type": "essay_question",
     # Optional
     "points": 10, # Defaults to 1
-    "additional_params": addn_params
+    "params": addn_params
 }
 
 canvasAPI.create_question(**question_details)
@@ -144,7 +160,7 @@ course_id = 1234
 endpoint = f'courses/{course_id}/assignments'
 
 params = {'example': "parameter"}
-assignment_objects = canvasAPI.paginate(endpoint, params, per_page=100)
+assignment_objects = canvasAPI.paginate(endpoint, params)
 
 assignment_ids = []
 for assignment in assignment_objects:
