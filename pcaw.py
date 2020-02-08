@@ -7,12 +7,10 @@ import urllib.parse
 
 # Python Canvas API Wrapper (pcaw)
 # Prototype, by Bailey M.
-# TODO: - implement logger
-#       - verify __init__ 'domain' variable URL formatting
+# TODO: - verify __init__ 'domain' variable URL formatting
 #       - in progress - implement endpoints as classes, with mixins for them
 #           in the "Pcaw" class, e.g. 'Pcaw(Quizzes):'
 #       - change genericPOST method name to just 'post'
-#       - make QuizObject class
 #       - move mixin classes to separate files?
 #       - refactor paginate method to use request method
 #       - implement get_questions Quizzes method
@@ -96,8 +94,8 @@ class Quizzes:
 
         return response
 
-    def create_question(self, title, text, q_type, quiz_id, course_id,
-                        points=1, params={}):
+    def create_question(self, course_id, quiz_id, title,
+                        text, q_type, points=1, params={}):
         """
         Creates a quiz question
 
@@ -161,8 +159,6 @@ class Pcaw(Quizzes):
 
         self.log_level = log_level
         self.log("init", f"Initalized; Domain: {self.domain}")
-        self.log("init", "Warning logs enables", "WARNING")
-        self.log("init", "test error", "ERROR")
 
     def log(self, f_name, string, log_level="INFO"):
         """
