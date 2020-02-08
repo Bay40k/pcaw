@@ -97,6 +97,8 @@ quiz_id = 1234
 # Use quiz object:
 quiz_id = quiz["id"]
 
+
+# Additional parameters are optional (this applies to all pcaw Quizzes methods)
 addn_params = {'question[neutral_comments]': "Neutral Comment"}
 
 canvasAPI.create_question(course_id=course_id, quiz_id=quiz_id,
