@@ -22,7 +22,7 @@ class Quizzes:
 
     def get_quiz(self, course_id, quiz_id, params={}):
         """
-        Gets a single quiz, returns JSON quiz object
+        Gets a single quiz, returns JSON Quiz object
 
         GET /api/v1/courses/:course_id/quizzes/:id
         https://canvas.instructure.com/doc/api/quizzes.html#method.quizzes/quizzes_api.show
@@ -53,7 +53,7 @@ class Quizzes:
     def create_quiz(self, course_id, title, description, quiz_type,
                     params={}):
         """
-        Creates a quiz, returns JSON quiz object
+        Creates a quiz, returns JSON Quiz object
 
         POST /api/v1/courses/:course_id/quizzes
         https://canvas.instructure.com/doc/api/quizzes.html#method.quizzes/quizzes_api.create
@@ -94,10 +94,43 @@ class Quizzes:
 
         return response
 
+    def get_questions(self, course_id, quiz_id,
+                      quiz_submission_id=None, quiz_submission_attempt=None, params={}):
+        """
+        Returns array of JSON QuizQuestion objects in a quiz or a submission
+
+        GET /api/v1/courses/:course_id/quizzes/:quiz_id/questions
+        https://canvas.instructure.com/doc/api/quiz_questions.html#method.quizzes/quiz_questions.index
+        """
+        f_name = "get_questions"
+        self.check_type("course_id", course_id, int)
+        self.check_type("quiz_id", quiz_id, int)
+        self.check_type("params", params, dict)
+        if quiz_submission_id:
+            self.check_type("quiz_submission_id", quiz_submission_id, int)
+            params["quiz_submission_id"] = quiz_submission_id
+        if quiz_submission_attempt:
+            self.check_type("quiz_submission_attmpt", quiz_submission_attempt, int)
+            params["quiz_submission_attempt"] = quiz_submission_attempt
+
+        full_endpoint = f"courses/{course_id}/quizzes/{quiz_id}/questions"
+
+        final_url = urljoin(self.domain, full_endpoint)
+
+        self.log(f_name, f"Getting quiz questions from: {final_url}")
+        if params:
+            pretty_params = pprint.pformat(params, width=50)
+            self.log(f_name, f"Additional parameters: \n{pretty_params}")
+
+        response = self.paginate(final_url, params=params)
+        self.log(f_name, f"Success; Successfully obtained questions from quiz: {quiz_id}")
+
+        return response
+
     def create_question(self, course_id, quiz_id, title,
                         text, q_type, points=1, params={}):
         """
-        Creates a quiz question
+        Creates a quiz question, returns JSON QuizQuestion object
 
         POST /api/v1/courses/:course_id/quizzes/:quiz_id/questions
         https://canvas.instructure.com/doc/api/quiz_questions.html#method.quizzes/quiz_questions.create
@@ -140,7 +173,8 @@ class Quizzes:
         pretty_params = pprint.pformat(full_params, width=50)
         self.log(f_name, f"Final parameters: \n{pretty_params}")
 
-        self.genericPOST(questions_endpoint, full_params)
+        r = self.genericPOST(questions_endpoint, full_params)
+        return r
 
 
 class Pcaw(Quizzes):
@@ -183,24 +217,20 @@ class Pcaw(Quizzes):
         if print_log:
             print(f"pcaw: {log_level}: {function_name}: {string}")
 
-    def format_json(self, json_string):
+    def format_json(self, json_object):
         """
-        Takes an ugly JSON string (from a response)
-        and returns a nicely formatted JSON string
-
-        Enable "check" to only check if the string
-        is valid JSON, without printing
+        Takes an ugly JSON pbject (from a response)
+        and returns a nicely formatted JSON object
         """
         f_name = "format_json"  # Used for logging
 
         try:
-            json_loads = json.loads(json_string)
-            json_dumps = json.dumps(json_loads, indent=2)
+            json_dumps = json.dumps(json_object, indent=2)
             return(json_dumps)
 
         except JSONDecodeError:
             self.log(f_name, "The response is not valid JSON. Possibly HTML?"
-                     f"\nRaw Response:\n{json_string}", "ERROR")
+                     f"\nRaw Response:\n{json_object}", "ERROR")
             raise
 
     def request(self, url, request_type, params={}):
@@ -237,7 +267,10 @@ class Pcaw(Quizzes):
         elif request_type == "DELETE":
             r = requests.delete(params=params, **args)
 
-        response = self.format_json(r.text)
+        assert r.status_code != 401, "FATAL: 401 Unauthorized, is your " \
+            "access token correct?"
+
+        response = self.format_json(r.json())
 
         if "errors" in r.text:
             self.log(f_name, f"Canvas API returned error(s): \n{response}",
@@ -283,18 +316,6 @@ class Pcaw(Quizzes):
         r = requests.get(per_page_url, headers=self.headers, params=params)
 
         self.log(f_name, f"Full URL with HTTP params: {r.url}")
-
-        assert "/api/v1" in endpoint, \
-            "pcaw: /api/v1 was not found in the passed URL."
-
-        assert r.status_code != 401, "pcaw: 401 Unauthorized, is your " \
-            "access token correct?"
-
-        assert r.status_code == requests.codes.ok, "pcaw: Request not OK, " \
-            f"response code: {r.status_code}"
-
-        assert "Log In to Canvas" not in r.text, "pcaw: Canvas login page " \
-            "reached, is your access token correct?"
 
         try:
             raw = r.json()

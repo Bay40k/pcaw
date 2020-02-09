@@ -88,7 +88,7 @@ details = {
 quiz = canvasAPI.create_quiz(**details)
 ```
 
-#### Generate JSON quiz object from existing quiz using `get_quiz()` method
+#### Get JSON Quiz object from existing quiz using `get_quiz()` method
 
 ```python
 canvasAPI = Pcaw(domain, access_token)
@@ -103,7 +103,24 @@ addn_params = {'example': "parameter"}
 quiz = canvasAPI.get_quiz(15, 7670, params=addn_params)
 ```
 
-#### Creating a quiz question using `create_question()` method
+#### Get all questions from a quiz using `get_questions()` method, returns array of JSON QuizQuestion objects
+
+```python
+canvasAPI = Pcaw(domain, access_token)
+
+# quiz_submission_id and quiz_submission_attempt are optional
+questions = canvasAPI.get_questions(quiz["id"], quiz_submission_id=1234, quiz_submission_attempt=1)
+
+# Nicely print each question:
+for question in questions:
+    print(canvasAPI.format_json(question))
+    # Can do something else with each question here
+
+# Easily print all questions:
+print(canvasAPI.format_json(questions))
+```
+
+#### Creating a quiz question using `create_question()` method, returns JSON QuizQuestion object
 
 ```python
 canvasAPI = Pcaw(domain, access_token)
