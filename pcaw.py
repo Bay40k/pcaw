@@ -13,6 +13,7 @@ import urllib.parse
 #       - change genericPOST method name to just 'post'
 #       - move mixin classes to separate files?
 
+
 class Quizzes:
     def __init__(self):
         pass
