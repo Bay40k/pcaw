@@ -12,6 +12,10 @@ import urllib.parse
 #           in the "Pcaw" class, e.g. 'Pcaw(Quizzes):'
 #       - change genericPOST method name to just 'post'
 #       - move mixin classes to separate files?
+#       - optimize get_quiz() method into get() method
+#          that works on all endpoints?
+#       - rename Pcaw class to "ApiHandler", and have
+#          module classes/mixins inherit from that
 
 
 class Quizzes:
