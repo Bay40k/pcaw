@@ -47,7 +47,7 @@ canvasAPI.paginate(endpoint_to_paginate, per_page=100)
 
 # Paginate with HTTP parameters
 params = {"scope": "sent", "as_user_id": user_id}
-canvasAPI.paginate(endpoint_to_paginate, params)
+canvasAPI.paginate(endpoint_to_paginate, params=params)
 ```
 
 ### Authorization headers
