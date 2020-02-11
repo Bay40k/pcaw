@@ -12,9 +12,6 @@ import urllib.parse
 #           in the "Pcaw" class, e.g. 'Pcaw(Quizzes):'
 #       - change genericPOST method name to just 'post'
 #       - move mixin classes to separate files?
-#       - refactor paginate method to use request method
-#       - implement get_questions Quizzes method
-
 
 class Quizzes:
     def __init__(self):
@@ -95,7 +92,8 @@ class Quizzes:
         return response
 
     def get_questions(self, course_id, quiz_id,
-                      quiz_submission_id=None, quiz_submission_attempt=None, params={}):
+                      quiz_submission_id=None, quiz_submission_attempt=None,
+                      params={}):
         """
         Returns array of JSON QuizQuestion objects in a quiz or a submission
 
@@ -200,6 +198,7 @@ class Pcaw(Quizzes):
         """
         function_name = f_name
         log_level = log_level.upper()
+        self.log_level = self.log_level.upper()
         log_levels = ["INFO", "WARNING", "ERROR"]
 
         assert self.log_level in log_levels, \
@@ -270,7 +269,16 @@ class Pcaw(Quizzes):
         assert r.status_code != 401, "FATAL: 401 Unauthorized, is your " \
             "access token correct?"
 
-        response = self.format_json(r.json())
+        try:
+            json_response = r.json()
+        except JSONDecodeError as e:
+            self.log(f_name, f"The response is not valid JSON. \n{e}", "ERROR")
+            raise
+        except Exception as e:
+            self.log(f_name, f"There was an unexpected error: \n{e}", "ERROR")
+            raise
+
+        response = self.format_json(json_response)
 
         if "errors" in r.text:
             self.log(f_name, f"Canvas API returned error(s): \n{response}",
@@ -313,30 +321,22 @@ class Pcaw(Quizzes):
         endpoint = urljoin(self.domain, endpoint)
 
         per_page_url = endpoint + f"?per_page={per_page}"
-        r = requests.get(per_page_url, headers=self.headers, params=params)
+        r = self.request(per_page_url, "GET", params)
+        json_response = r.json()
 
         self.log(f_name, f"Full URL with HTTP params: {r.url}")
-
-        try:
-            raw = r.json()
-        except JSONDecodeError as e:
-            self.log(f_name, f"The response is not valid JSON. \n{e}", "ERROR")
-            raise
-        except Exception as e:
-            self.log(f_name, f"There was an unexpected error: \n{e}", "ERROR")
-            raise
 
         item_set = []
 
         self.log(f_name, 'Going through first page...')
-        for item in raw:
+        for item in json_response:
             item_set.append(item)
 
         self.log(f_name, 'Going through the next pages...')
         while r.links['current']['url'] != r.links['last']['url']:
-            r = requests.get(r.links['next']['url'], headers=self.headers)
-            raw = r.json()
-            for item in raw:
+            r = self.request(r.links['next']['url'], "GET", params)
+            json = r.json()
+            for item in json:
                 item_set.append(item)
 
         if not item_set:
