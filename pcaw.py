@@ -266,6 +266,14 @@ class Pcaw(Quizzes):
         assert r.status_code != 401, "FATAL: 401 Unauthorized, is your " \
             "access token correct?"
 
+        if "errors" in r.text:
+            self.log(f_name, f"Canvas API returned error(s): \n{response}",
+                     "ERROR")
+
+        assert r.status_code == requests.codes.ok, "FATAL: Request not OK, " \
+            f"response status code: {r.status_code}" \
+            f"\nResponse: \n{r.text}"
+
         try:
             json_response = r.json()
         except JSONDecodeError as e:
@@ -276,14 +284,6 @@ class Pcaw(Quizzes):
             raise
 
         response = self.format_json(json_response)
-
-        if "errors" in r.text:
-            self.log(f_name, f"Canvas API returned error(s): \n{response}",
-                     "ERROR")
-
-        assert r.status_code == requests.codes.ok, "FATAL: Request not OK, " \
-            f"response status code: {r.status_code}" \
-            f"\nResponse: \n{response}"
 
         self.log(f_name, f"Success; {request_type} request to '{url}' sucessful")
         if self.show_responses:
