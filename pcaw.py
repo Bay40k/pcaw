@@ -350,7 +350,7 @@ class Pcaw(Quizzes):
 
     def get(self, endpoint, params={}):
         """
-        Generic function to get/return a single JSON object from an endpoint
+        Generic GET function to get/return a single JSON object from an endpoint
         """
         f_name = "get"
         self.check_type("endpoint", endpoint, str)

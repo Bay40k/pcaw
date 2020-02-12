@@ -167,6 +167,24 @@ params = {'course[name]': "Course Name",
 canvasAPI.post(endpoint, params)
 ```
 
+#### Getting a single course as a JSON Course object using `get()` method
+
+```python
+canvasAPI = Pcaw(domain, access_token)
+
+course_id = 123456
+endpoint = f'courses/{course_id}'
+
+# or (per API documentation)
+
+account_id = 1234
+endpoint = f'accounts/{account_id}/courses/{course_id}'
+
+course = canvasAPI.get(endpoint)
+
+course["id"] # Returns: 123456
+```
+
 #### Getting all assignment IDs in a course
 
 ```python
