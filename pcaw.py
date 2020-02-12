@@ -324,9 +324,9 @@ class Pcaw(Quizzes):
         self.log(f_name, f"Paginating: {endpoint}")
 
         endpoint = urljoin(self.domain, endpoint)
+        params = {"per_page": per_page, **params}
 
-        per_page_url = endpoint + f"?per_page={per_page}"
-        r = self.request(per_page_url, "GET", params)
+        r = self.request(endpoint, "GET", params)
         json_response = r.json()
 
         self.log(f_name, f"Full URL with HTTP params: {r.url}")
