@@ -153,7 +153,7 @@ canvasAPI.create_question(**question_details)
 
 ### More examples
 
-#### Creating a course using genericPOST method
+#### Creating a course using `post()` method
 
 ```python
 canvasAPI = Pcaw(domain, access_token)
@@ -164,7 +164,7 @@ endpoint = f'accounts/{account_id}/courses'
 params = {'course[name]': "Course Name",
           'course[course_code]': "Course_Code_1234"}
 
-canvasAPI.genericPOST(endpoint, params)
+canvasAPI.post(endpoint, params)
 ```
 
 #### Getting all assignment IDs in a course

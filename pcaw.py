@@ -10,7 +10,6 @@ import urllib.parse
 # TODO: - verify __init__ 'domain' variable URL formatting
 #       - in progress - implement endpoints as classes, with mixins for them
 #           in the "Pcaw" class, e.g. 'Pcaw(Quizzes):'
-#       - change genericPOST method name to just 'post'
 #       - move mixin classes to separate files?
 #       - optimize get_quiz() method into get() method
 #          that works on all endpoints?
@@ -88,11 +87,11 @@ class Quizzes:
         pretty_params = pprint.pformat(full_params, width=50)
         self.log(f_name, f"Final parameters: \n{pretty_params}")
 
-        response = self.genericPOST(quizzes_endpoint, full_params)
+        response = self.post(quizzes_endpoint, full_params)
 
         html_url = response["html_url"]
 
-        self.log(f_name, f"pcaw: create_quiz: New quiz URL: {html_url}")
+        self.log(f_name, f"New quiz URL: {html_url}")
 
         return response
 
@@ -176,7 +175,7 @@ class Quizzes:
         pretty_params = pprint.pformat(full_params, width=50)
         self.log(f_name, f"Final parameters: \n{pretty_params}")
 
-        r = self.genericPOST(questions_endpoint, full_params)
+        r = self.post(questions_endpoint, full_params)
         return r
 
 
@@ -299,7 +298,7 @@ class Pcaw(Quizzes):
 
         return r
 
-    def genericPOST(self, endpoint, params):
+    def post(self, endpoint, params):
         """
         Generic POST request function that passes your desired
         parameters to a desired endpoint, using self.headers
@@ -357,3 +356,27 @@ class Pcaw(Quizzes):
         assert isinstance(object_to_check, intended_type), \
             f"'{variable_name}' must be type '{intended_type.__name__}', " \
             f"instead it's: '{type(object_to_check).__name__}'"
+
+    def get(self, endpoint, params={}):
+        """
+        Generic function to get/return a single JSON object from an endpoint
+        """
+        f_name = "get"
+        self.check_type("endpoint", endpoint, str)
+        self.check_type("params", params, dict)
+
+        full_url = urljoin(self.domain, endpoint)
+
+        self.log(f_name, f"Generating JSON object from: {full_url}")
+        if params:
+            pretty_params = pprint.pformat(params, width=50)
+            self.log(f_name, f"Additional parameters: \n{pretty_params}")
+
+        response = self.request(full_url, "GET", params=params)
+        response = response.json()
+
+        html_url = response["html_url"]
+
+        self.log(f_name, f"Success; JSON object URL: {html_url}")
+
+        return response
