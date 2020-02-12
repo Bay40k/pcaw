@@ -153,7 +153,7 @@ canvasAPI.create_question(**question_details)
 
 ### More examples
 
-#### Creating a course using `post()` method
+#### Creating a course using `post()` method, returns JSON Course object
 
 ```python
 canvasAPI = Pcaw(domain, access_token)
@@ -167,7 +167,7 @@ params = {'course[name]': "Course Name",
 canvasAPI.post(endpoint, params)
 ```
 
-#### Getting a single course as a JSON Course object using `get()` method
+#### Getting a single course using `get()` method, returns JSON Course object
 
 ```python
 canvasAPI = Pcaw(domain, access_token)
