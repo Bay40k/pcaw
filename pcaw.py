@@ -11,8 +11,6 @@ import urllib.parse
 #       - in progress - implement endpoints as classes, with mixins for them
 #           in the "Pcaw" class, e.g. 'Pcaw(Quizzes):'
 #       - move mixin classes to separate files?
-#       - optimize get_quiz() method into get() method
-#          that works on all endpoints?
 #       - rename Pcaw class to "ApiHandler", and have
 #          module classes/mixins inherit from that
 
@@ -36,17 +34,10 @@ class Quizzes:
         full_endpoint = f"courses/{course_id}/quizzes/{quiz_id}"
 
         quiz_url = urljoin(self.domain, full_endpoint)
-
-        self.log(f_name, f"Generating quiz object from: {quiz_url}")
-        if params:
-            pretty_params = pprint.pformat(params, width=50)
-            self.log(f_name, f"Additional parameters: \n{pretty_params}")
-
-        response = self.request(quiz_url, "GET", params=params)
-        response = response.json()
+        self.log(f_name, f"Getting quiz object from: {quiz_url}")
+        response = self.get(quiz_url, params)
 
         html_url = response["html_url"]
-
         self.log(f_name, f"Success; Quiz object URL: {html_url}")
 
         return response
@@ -367,7 +358,7 @@ class Pcaw(Quizzes):
 
         full_url = urljoin(self.domain, endpoint)
 
-        self.log(f_name, f"Generating JSON object from: {full_url}")
+        self.log(f_name, f"Getting JSON object from: {full_url}")
         if params:
             pretty_params = pprint.pformat(params, width=50)
             self.log(f_name, f"Additional parameters: \n{pretty_params}")
@@ -375,8 +366,6 @@ class Pcaw(Quizzes):
         response = self.request(full_url, "GET", params=params)
         response = response.json()
 
-        html_url = response["html_url"]
-
-        self.log(f_name, f"Success; JSON object URL: {html_url}")
+        self.log(f_name, f"Success; JSON object URL: {full_url}")
 
         return response
