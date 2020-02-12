@@ -28,6 +28,9 @@ canvasAPI = Pcaw(domain, access_token, show_responses=True, log_level="info")
 
 # Positional args
 canvasAPI = Pcaw(domain, access_token, True, "info")
+
+# Omittable
+canvasAPI = Pcaw(domain, access_token)
 ```
 
 ## Examples

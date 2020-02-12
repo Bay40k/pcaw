@@ -12,7 +12,9 @@ import urllib.parse
 #           in the "Pcaw" class, e.g. 'Pcaw(Quizzes):'
 #       - move mixin classes to separate files?
 #       - rename Pcaw class to "ApiHandler", and have
-#          module classes/mixins inherit from that
+#           module classes/mixins inherit from that
+#       - implement way to get associated question banks for questions in a quiz,
+#           to be able to get the bank's "updated_at" parameter
 
 
 class Quizzes:
