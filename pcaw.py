@@ -267,7 +267,7 @@ class Pcaw(Quizzes):
             "access token correct?"
 
         if "errors" in r.text:
-            self.log(f_name, f"Canvas API returned error(s): \n{response}",
+            self.log(f_name, f"Canvas API returned error(s): \n{r.text}",
                      "ERROR")
 
         assert r.status_code == requests.codes.ok, "FATAL: Request not OK, " \
