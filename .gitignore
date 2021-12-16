@@ -1,5 +1,2 @@
-# file I use for testing the wrapper
-test_implementation*
-
-# ignore pycache folder
+.*
 __pycache__/
