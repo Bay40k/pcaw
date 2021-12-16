@@ -120,6 +120,8 @@ class MyPcaw(Pcaw):
             params = {}
         if account:
             account = f"accounts/{account}/"
+        else:
+            account = ""
         endpoint = f"{account}courses/{course}/assignments/{assignment_id}"
         assigment = self.get(endpoint, params)
         return Assignment(assignment_id, course, account, assigment)
