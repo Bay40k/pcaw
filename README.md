@@ -12,7 +12,7 @@ from pcaw import Pcaw
 domain = '<canvas>' # e.g. 'canvas.instructure.com'
 access_token = '<token_goes_here>'
 
-canvasAPI = Pcaw(domain, access_token)
+canvas_api = Pcaw(domain, access_token)
 ```
 
 ## Logging
@@ -24,13 +24,13 @@ canvasAPI = Pcaw(domain, access_token)
 # "Info"    - Prints most information to console, useful for debugging
 
 # You can also enable "show_responses" to print HTTP responses to the console
-canvasAPI = Pcaw(domain, access_token, show_responses=True, log_level="info")
+canvas_api = Pcaw(domain, access_token, show_responses=True, log_level="info")
 
 # Positional args
-canvasAPI = Pcaw(domain, access_token, True, "info")
+canvas_api = Pcaw(domain, access_token, True, "info")
 
 # Omittable
-canvasAPI = Pcaw(domain, access_token)
+canvas_api = Pcaw(domain, access_token)
 ```
 
 ## Examples
@@ -40,126 +40,41 @@ canvasAPI = Pcaw(domain, access_token)
 ```python
 from pcaw import Pcaw
 
-canvasAPI = Pcaw(domain, access_token)
+canvas_api = Pcaw(domain, access_token)
 
-endpoint_to_paginate = 'courses/xxxxx/assignments'
+endpoint_to_paginate = 'accounts/xxxxx/courses/xxxxx/assignments'
 
 # Automatically paginate and return full array of JSON objects from an endpoint:
 # per_page defaults to 100, therefore omittable
-canvasAPI.paginate(endpoint_to_paginate, per_page=100)
+assigments = canvas_api.paginate(endpoint_to_paginate, per_page=100)
 
 # Paginate with HTTP parameters
-params = {"scope": "sent", "as_user_id": user_id}
-canvasAPI.paginate(endpoint_to_paginate, params=params)
+params = {"param": "value", "as_user_id": "<user id>"}
+assignments = canvas_api.paginate(endpoint_to_paginate, params=params)
 ```
 
 ### Authorization headers
 
 ```python
 # You can also easily reference your access token/Authorization header with:
-canvasAPI.headers
+canvas_api.headers
 # Returns: {'Authorization': "Bearer <token_goes_here>"}
-# canvasAPI.access_token returns: <token_goes_here>
+# canvas_api.access_token returns: <token_goes_here>
 
 # Useful for something like:
 import requests
-requests.get(url, headers=canvasAPI.headers)
+requests.get(url, headers=canvas_api.headers)
 
 # And to add your own headers you could do:
-requests.get(url, headers={**canvasAPI.headers, 'your_own': "headers"})
+requests.get(url, headers={**canvas_api.headers, 'your_own': "headers"})
 ```
 
-### Quizzes module
-
-#### Creating a quiz using `create_quiz()` method
-
-```python
-canvasAPI = Pcaw(domain, access_token)
-
-canvasAPI.create_quiz(1234, title="Quiz title",
-                      description="Quiz description", quiz_type="assignment")
-
-# Alternatively:
-details = {
-    "course_id": 1234,
-    "title": "Quiz title",
-    "description": "Quiz description",
-    "quiz_type": "assignment", # Graded quiz
-}
-
-# Referencable JSON Canvas Quiz object
-quiz = canvasAPI.create_quiz(**details)
-```
-
-#### Get JSON Quiz object from existing quiz using `get_quiz()` method
-
-```python
-canvasAPI = Pcaw(domain, access_token)
-
-# Feel free to omit keyword arguments in favor of positional args
-quiz = canvasAPI.get_quiz(course_id=15, quiz_id=7670)
-
-quiz["id"] # Returns: 7670
-
-# Additional parameters are optional (this applies to all pcaw Quizzes methods)
-addn_params = {'example': "parameter"}
-quiz = canvasAPI.get_quiz(15, 7670, params=addn_params)
-```
-
-#### Get all questions from a quiz using `get_questions()` method, returns array of JSON QuizQuestion objects
-
-```python
-canvasAPI = Pcaw(domain, access_token)
-
-# quiz_submission_id and quiz_submission_attempt are optional
-questions = canvasAPI.get_questions(quiz["id"], quiz_submission_id=1234, quiz_submission_attempt=1)
-
-# Nicely print each question:
-for question in questions:
-    print(canvasAPI.format_json(question))
-    # Can do something else with each question here
-
-# Easily print all questions:
-print(canvasAPI.format_json(questions))
-```
-
-#### Creating a quiz question using `create_question()` method, returns JSON QuizQuestion object
-
-```python
-canvasAPI = Pcaw(domain, access_token)
-
-course_id = 1234
-quiz_id = 1234
-
-# Use quiz object:
-quiz_id = quiz["id"]
-
-addn_params = {'question[neutral_comments]': "Neutral Comment"}
-
-canvasAPI.create_question(course_id, quiz_id,
-                          title="Title", text="Text", q_type="essay_question",
-                          pontis=10, params=addn_params)
-# Alternatively:
-question_details = {
-    "course_id": course_id,
-    "quiz_id": quiz_id,
-    "title": "Title",
-    "text": "Text",
-    "q_type": "essay_question",
-    # Optional
-    "points": 10, # Defaults to 1
-    "params": addn_params
-}
-
-canvasAPI.create_question(**question_details)
-```
-
-### More examples
+### Examples
 
 #### Creating a course using `post()` method, returns JSON Course object
 
 ```python
-canvasAPI = Pcaw(domain, access_token)
+canvas_api = Pcaw(domain, access_token)
 
 account_id = 1234
 endpoint = f'accounts/{account_id}/courses'
@@ -167,37 +82,63 @@ endpoint = f'accounts/{account_id}/courses'
 params = {'course[name]': "Course Name",
           'course[course_code]': "Course_Code_1234"}
 
-canvasAPI.post(endpoint, params)
+canvas_api.post(endpoint, params)
 ```
 
 #### Getting a single course using `get()` method, returns JSON Course object
 
 ```python
-canvasAPI = Pcaw(domain, access_token)
+canvas_api = Pcaw(domain, access_token)
 
 course_id = 123456
-endpoint = f'courses/{course_id}'
-
-# or (per API documentation)
-
 account_id = 1234
 endpoint = f'accounts/{account_id}/courses/{course_id}'
 
-course = canvasAPI.get(endpoint)
+course = canvas_api.get(endpoint)
 
 course["id"] # Returns: 123456
+```
+
+#### Extending Pcaw object with custom `Assignment` object and `get_assignment()` method
+```python
+from pcaw import Pcaw
+
+class Assignment:
+    def __init__(self, account: int, course: int, id: int, obj: dict):
+        self.account = account
+        self.course = course
+        self.id = id
+        self.obj = obj
+
+class MyPcaw(Pcaw):
+    def __init__(self, domain: str, access_token: str):
+        super().__init__(domain, access_token)
+
+    def get_assignment(self, account: int, course: int, 
+                       assignment_id: int, params: dict = None) -> Assignment:
+        if not params:
+            params = {}
+        endpoint = f"accounts/{account}/courses/{course}/assignments/{assignment_id}"
+        assigment = self.get(endpoint, params)
+        return Assignment(account, course, assignment_id, assigment)
+
+canvas_api = MyPcaw(domain, access_token)
+assignment = canvas_api.get_assignment(account, course, assignment_id)
+
+assignment.id # Returns assignment's id
+assignment.obj # Returns assignment raw JSON object (dict)
 ```
 
 #### Getting all assignment IDs in a course
 
 ```python
-canvasAPI = Pcaw(domain, access_token)
+canvas_api = Pcaw(domain, access_token)
 
 course_id = 1234
 endpoint = f'courses/{course_id}/assignments'
 
 params = {'example': "parameter"}
-assignment_objects = canvasAPI.paginate(endpoint, params)
+assignment_objects = canvas_api.paginate(endpoint, params)
 
 assignment_ids = []
 for assignment in assignment_objects:
@@ -207,8 +148,7 @@ print(assignment_ids)
 
 # or
 
-assignment_id_map = map(lambda x: x["id"], assignment_objects)
-assignment_ids = list(assignment_id_map)
+assignment_ids = [a["id"] for a in assignment_objects]
 
 print(assignment_ids)
 ```

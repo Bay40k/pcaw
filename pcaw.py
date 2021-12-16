@@ -1,9 +1,10 @@
-import requests
 from json.decoder import JSONDecodeError
+from typing import List
+from urllib.parse import ParseResult
+from urllib.parse import urljoin
 import json
 import pprint
-from urllib.parse import urljoin
-from urllib.parse import ParseResult
+import requests
 
 # Python Canvas API Wrapper (pcaw)
 # Prototype, by Bailey M.
@@ -135,7 +136,7 @@ class Pcaw:
 
         return r.json()
 
-    def paginate(self, endpoint: str, per_page: int = 100, params: dict = None) -> list:
+    def paginate(self, endpoint: str, per_page: int = 100, params: dict = None) -> List[dict]:
         """
         Returns all items/JSON objects (in an array) from an endpoint
         / handles pagination
