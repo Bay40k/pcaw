@@ -114,13 +114,13 @@ class MyPcaw(Pcaw):
     def __init__(self, domain: str, access_token: str):
         super().__init__(domain, access_token)
 
-    def get_assignment(self, account: int, course: int, 
-                       assignment_id: int, params: dict = None) -> Assignment:
+    def get_assignment(self, assignment_id: int, course: int, 
+                       account: int = None, params: dict = None) -> Assignment:
         if not params:
             params = {}
         endpoint = f"accounts/{account}/courses/{course}/assignments/{assignment_id}"
         assigment = self.get(endpoint, params)
-        return Assignment(account, course, assignment_id, assigment)
+        return Assignment(assignment_id, course, account, assigment)
 
 canvas_api = MyPcaw(domain, access_token)
 assignment = canvas_api.get_assignment(account, course, assignment_id)
