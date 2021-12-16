@@ -104,7 +104,7 @@ course["id"] # Returns: 123456
 from pcaw import Pcaw
 
 class Assignment:
-    def __init__(self, id:int, course: int, account: int, obj: dict):
+    def __init__(self, id: int, course: int, account: int, obj: dict):
         if not account:
             self.account = None
         else:
