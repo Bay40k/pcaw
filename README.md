@@ -118,7 +118,9 @@ class MyPcaw(Pcaw):
                        account: int = None, params: dict = None) -> Assignment:
         if not params:
             params = {}
-        endpoint = f"accounts/{account}/courses/{course}/assignments/{assignment_id}"
+        if account:
+            account = f"accounts/{account}/"
+        endpoint = f"{account}courses/{course}/assignments/{assignment_id}"
         assigment = self.get(endpoint, params)
         return Assignment(assignment_id, course, account, assigment)
 
