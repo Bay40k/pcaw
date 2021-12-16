@@ -69,7 +69,7 @@ requests.get(url, headers=canvas_api.headers)
 requests.get(url, headers={**canvas_api.headers, 'your_own': "headers"})
 ```
 
-### Examples
+### More examples
 
 #### Creating a course using `post()` method, returns JSON Course object
 
