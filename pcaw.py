@@ -173,7 +173,7 @@ class Pcaw:
         self.log(f_name, f"Success; Sucessfully paginated endpoint: {r.url}")
         return item_set
 
-    def get(self, endpoint: str, params) -> dict:
+    def get(self, endpoint: str, params: dict = None) -> dict:
         """
         Generic GET function to get/return a single JSON object from an endpoint
         """
