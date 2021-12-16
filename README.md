@@ -127,7 +127,7 @@ class MyPcaw(Pcaw):
         return Assignment(assignment_id, course, account, assigment)
 
 canvas_api = MyPcaw(domain, access_token)
-assignment = canvas_api.get_assignment(account, course, assignment_id)
+assignment = canvas_api.get_assignment(assignment_id, course, account)
 
 assignment.id # Returns assignment's id
 assignment.obj # Returns assignment raw JSON object (dict)
