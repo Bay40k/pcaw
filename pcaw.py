@@ -123,13 +123,15 @@ class Pcaw:
 
         return r
 
-    def post(self, endpoint: str, params: dict) -> dict:
+    def post(self, endpoint: str, params: dict = None) -> dict:
         """
         Generic POST request function that passes your desired
         parameters to a desired endpoint, using self.headers
 
         Returns JSON object of response
         """
+        if not params:
+            params = {}
         url = urljoin(self.domain, endpoint)
 
         r = self.request(url, request_type="POST", params=params)
